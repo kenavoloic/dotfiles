@@ -1,0 +1,14 @@
+Keymap = keymap
+StartInMusicDir = yes
+Repeat = yes
+AutoNext = yes
+SavePlaylist = yes
+MusicDir = "/home/bernie/yp3/webradios/"
+FastDir1 = "/home/bernie/yp3/webradios/"
+FastDir2 = "/home/bernie/yp3"
+FastDir3 = "/media/winD/yp3"
+FastDir4 = "/media/winE/zp3tank/"
+
+
+
+

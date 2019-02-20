@@ -1,0 +1,978 @@
+#+STARTUP: content
+
+* Interface
+#+BEGIN_SRC emacs-lisp
+(setq default-major-mode 'text-mode)
+(setq test-mode-hook 'turn-on-auto-fill)
+; transient-mark-mode : selection active en couleur
+(setq-default transient-mark-mode t)
+
+(display-time)
+(setq display-time-24hr-format t)
+(set-keyboard-coding-system 'iso-latin-1)
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;plus doux que le beep
+(setq visible-bell t)
+; provide access to system clipboard
+(setq x-select-enable-clipboard t)  
+;mouse selection
+(setq-default mouse-yank-at-point t)
+;syntaxe coloree
+(global-font-lock-mode 1)
+
+(show-paren-mode 1)
+(line-number-mode t)
+(column-number-mode t)
+(global-set-key "\M-w" 'kill-ring-save)
+(global-set-key "\M-s" 'replace-string)
+
+(beacon-mode 1)
+(setq beacon-color 0.35)
+
+;; http://ivanmalison.gitbub.io/dotfiles
+;pas de scroll-bar
+(scroll-bar-mode -1)
+;pas de barre d'outils
+(tool-bar-mode -1)
+; pas d'indication du numéro de la colonne utilisée
+(column-number-mode -1)
+
+; réglages plus fins de la souris
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+(setq mouse-wheel-progressive-speed nil)
+
+; Affiche la localisation du fichier en cours d'édition comme le titre de la fenêtre.
+(setq frame-title-format '("" (buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+
+; utf-8 par défaut
+;(setq org-export-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+;(set-charset-priority 'unicode)
+;(setq default-process-coding-system '(utf-8-unix . utf-8-unix))
+
+#+END_SRC
+
+* Historique
+# sacha chua
+#+BEGIN_SRC emacs-lisp
+
+;; (setq savehist-file "~/.emacs.d/savehist")
+;; (savehist-mode 1)
+;; (setq history-length t)
+;; (setq history-delete-duplicates t)
+;; (setq savehist-save-minibuffer-history 1)
+;; (setq savehist-additional-variables
+;;       '(kill-ring
+;;        search-ring
+;;        regexp-search-ring))
+
+#+END_SRC
+* Org-mode
+#+BEGIN_SRC emacs-lisp
+(require 'org)
+
+#+END_SRC
+* Babel
+#+BEGIN_SRC elisp
+;; Some initial languages we want org-babel to support
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   (sh . t)
+   (python . t)
+   (R . t)
+   (ditaa . t)
+   (perl . t)
+   (gnuplot . t)
+   (php . t)
+   ))
+
+#+END_SRC
+* Réglages org-mode
+#+BEGIN_SRC emacs-lisp
+    ;;Boulets dans org
+    (use-package org-bullets
+      :ensure t
+      :config
+      (add-hook 'org-mode-hook (lambda()(org-bullets-mode 1))))
+
+    ;;Utilisations des 3 petits points en lieu et place des ... d'origine
+    (setq org-ellipsis " …")
+
+    ;Toujours ouvrir un ficher avec les 
+    (setq org-startup-folded t)
+
+    ;; ;utf-8
+    ;; (setq org-export-coding-system 'utf-8)
+    ;; (prefer-coding-system 'utf-8)
+    ;; (set-charset-priority 'unicode)
+    ;; (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
+
+  (setq org-edit-src-content-indentation 0)
+
+    (setq org-emphasis-alist '(("*" bold "<b>" "</b>")
+			       ("/" italic "<i>" "</i>")
+			       ("_" underline "<span style=\"text-decoration:underline;\">" "</span>")
+			       ("=" org-code "<code>" "</code>" verbatim)
+			       ("~" org-verbatim "<code>" "</code>" verbatim)))
+
+
+#+END_SRC
+
+# http://thomasf.github.io/solarized-css/
+# (setq org-export-html-style-include-scripts nil
+#        org-export-html-style-include-default nil)
+#  (setq org-export-html-style
+#    "<link rel=\"stylesheet\" type=\"text/css\" href=\"solarized-light.css\" />")
+
+* Misc
+#+BEGIN_SRC emacs-lisp
+(use-package auto-complete
+  :ensure t
+  :init
+  (progn
+    (ac-config-default)
+    (global-auto-complete-mode t)
+    ))
+
+;; # ivanmalison.github.io/dotfiles
+;; (use-package rainbow-delimiters
+;;   :command rainbow-delimiters-mode
+;;   :init 
+;;   (progn
+;;     (add-hook 'prog-mode-hook (lambda() (rainbow-delimiters-mode-t )))))
+#+END_SRC
+goto-char position
+
+* Expressions régulières
+#+BEGIN_SRC emacs-lisp
+  (require 're-builder)
+  (setq reb-re-syntax 'string)
+
+(defun occurrences (regexp &rest ignore)
+  "Show all matches for REGEXP in an `occur' buffer."
+  ;; keep text covered by occur-prefix and match text-properties
+  ;; http://www.emacswiki.org/emacs/OccurMode
+  (interactive (occur-read-primary-args))
+  (occur regexp)
+  (with-current-buffer (get-buffer "*Occur*")
+    (let ((inhibit-read-only t)
+	  delete-from
+	  pos)
+      (save-excursion
+	(while (setq pos (next-property-change (point)))
+	  (goto-char pos)
+	  (if (not (or (get-text-property (point) 'occur-prefix)
+		       (get-text-property (point) 'occur-match)))
+	      (if delete-from
+		  (delete-region delete-from (point))
+		(setq delete-from (point)))
+	    (when delete-from
+	      (delete-region delete-from (point))
+	      (if (get-text-property (point) 'occur-prefix)
+		  (insert "\n")
+		(insert " ")))
+	    (setq delete-from nil)))))))
+
+#+END_SRC
+* Dictionnaire
+#+BEGIN_SRC emacs-lisp
+
+(setq-default ispell-personnal-name "aspell")
+(setq ispell-personal-dictionary "~/.ispell-dico-perso")
+
+#+END_SRC
+* Mobi
+#+BEGIN_SRC emacs-lisp
+(defun mobi-opf-header()
+  "inserts opf header for mobi(kf8)"
+  (interactive)
+  (save-excursion
+    (insert "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+    (insert "<package unique-identifier=\"uid\" xmlns:opf=\"http://www.idpf.org/2007/opf\" 
+xmlns:asd=\"http://www.idpf.org/asdfaf\">\n")
+    (insert "<metadata>\n")
+    (insert "<dc-metadata  xmlns:dc=\"http://purl.org/metadata/dublin_core\" xmlns:oebpacka
+ge=\"http://openebook.org/namespaces/oeb-package/1.0/\">\n")
+    (insert "\n")
+    (insert "\n")
+    (insert "\n")
+    (insert "<x-metadata>\n")
+    (insert "<EmbeddedCover>images/cover.png\n")
+    (insert "</EmbeddedCover>\n")
+    (insert "</x-metadata>\n")
+    (insert "</dc-metadata>\n")
+    (insert "</metadata>\n")
+))
+
+(defun mobi-opf-guide()
+  "insert a working guide for mobi8/kf8 so that the book opens on the titlepage"
+  (interactive)
+  (save-excursion
+    (insert "    <reference href=\"titre.xhtml\" type=\"title-page\" title=\"Page de titre\"/>\n")
+    (insert "    <reference href=\"tdm.xhtml\" type=\"toc\" title=\"Sommaire\"/>\n")
+    (insert "    <reference href=\"titre.xhtml\" type=\"text\" title=\"Start\"/>\n")
+))
+
+#+END_SRC
+* Xhtml headers
+#+BEGIN_SRC emacs-lisp
+(defun cca-transitional-header()
+  "inserts transtional html header"
+  (interactive)
+  (save-excursion
+    (insert "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01\n")
+    (insert "Transitional//en\"")
+    (insert "\"http://www.w3.org/TR/html4/loose.dtd\">\n")
+    (insert "<html lang=\"en\">\n")
+    (insert "<head>\n")
+    (insert "<title></title>\n")
+    (insert "</head>\n")
+    (insert "<body>\n")))
+
+(defun cca-transitional-footer()
+  "inserts transitional html footer"
+  (interactive)
+  (save-excursion
+    (insert "</body>\n")
+    (insert "</html>\n")))
+
+(defun cca-html5-template()
+"insert html empty doc"
+(interactive)
+(save-excursion
+(insert "<!DOCTYPE html>\n")
+(insert "<head>\n")
+(insert "<meta charset=\"utf-8\">\n")
+(insert "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n")
+(insert "<title></title>\n")
+(insert "<style></style>\n")
+(insert "</head>\n")
+(insert "<body>\n")
+(insert "</body>\n")
+(insert "</html>\n")))
+
+#+END_SRC
+* Mise en page html : paragraphes + entêtes
+
+#+BEGIN_SRC emacs-lisp
+(defun cca-parap(d1 d2)
+  (interactive"r")
+  (save-excursion
+    (goto-char d2)(insert "</p>")
+    (goto-char d1)(insert "<p>")))
+
+(defun cca-h1(d1 d2)
+  (interactive "r")
+  (save-excursion
+    (goto-char d2)(insert "</h1>")
+    (goto-char d1)(insert "<h1>")
+))
+
+(defun cca-h2(d1 d2)
+  (interactive "r")
+  (save-excursion
+    (goto-char d2)(insert "</h2>")
+    (goto-char d1)(insert "<h2>")
+))
+
+(defun cca-h3(d1 d2)
+  (interactive "r")
+  (save-excursion
+    (goto-char d2)(insert "</h3>")
+    (goto-char d1)(insert "<h3>")
+))
+
+(defun cca-h4(d1 d2)
+  (interactive "r")
+  (save-excursion
+    (goto-char d2)(insert "</h4>")
+    (goto-char d1)(insert "<h4>")
+))
+
+
+(defun cca-h5(d1 d2)
+  (interactive "r")
+  (save-excursion
+    (goto-char d2)(insert "</h5>")
+    (goto-char d1)(insert "<h5>")
+))
+
+
+(defun cca-h6(d1 d2)
+  (interactive "r")
+  (save-excursion
+    (goto-char d2)(insert "</h6>")
+    (goto-char d1)(insert "<h6>")
+))
+
+
+#+END_SRC
+* Mise en page html : tableaux + listes
+#+BEGIN_SRC emacs-lisp
+; Tableaux
+
+(defun cca-trth(debut fin)
+  "A partir d'une région sélectionnée, place <tr><th>au début et </th></tr> à la fin"
+  (interactive "r")
+  (save-excursion
+    (goto-char fin)(insert "</th></tr>")
+    (goto-char debut)(insert "<tr><th colspan=\"\" class=\"titre\">")
+))
+
+
+(defun cca-trtd(debut fin)
+  "A partir d'une région sélectionnée, place <tr><td>au début et </td></tr> à la fin"
+  (interactive "r")
+  (save-excursion
+    (goto-char fin)(insert "</td></tr>")
+    (goto-char debut)(insert "<tr><td colspan=\"\" class=\"titre\">")
+))
+
+
+(defun cca-tr(debut fin)
+  "A partir d'une région sélectionnée, place <tr>au début et </tr> à la fin"
+  (interactive "r")
+  (save-excursion
+    (goto-char fin)(insert "</tr>")
+    (goto-char debut)(insert "<tr>")
+))
+
+(defun cca-td(debut fin)
+  "A partir d'une région sélectionnée, place <td>au début et </td> à la fin"
+  (interactive "r")
+  (save-excursion
+    (goto-char fin)(insert "</td>")
+    (goto-char debut)(insert "<td>")
+))
+
+
+;definition list
+
+(defun cca-dl(deb fin)
+  (interactive "r")
+  (save-excursion
+    (goto-char fin)(insert "</dl>\n")
+    (goto-char deb)(insert "<dl class=\"\">\n")
+))
+
+(defun cca-dt(deb fin)
+  (interactive "r")
+  (save-excursion
+    (goto-char fin)(insert "</dt>")
+    (goto-char deb)(insert "<dt>")
+))
+
+(defun cca-dd(deb fin)
+  (interactive "r")
+  (save-excursion
+    (goto-char fin)(insert "</dd>")
+    (goto-char deb)(insert "<dd>")
+))
+
+
+#+END_SRC
+* Mise en page html : typographie : signes doubles
+#+BEGIN_SRC emacs-lisp
+(defun cca-exclamation()
+  (interactive)
+  (save-excursion
+    (insert " !")))
+
+(defun cca-interrogation()
+  (interactive)
+  (save-excursion
+    (insert " ?")))
+
+(defun cca-deuxpoints()
+  (interactive)
+  (save-excursion
+    (insert " :")))
+
+(defun cca-pointvirgule()
+  (interactive)
+  (save-excursion
+    (insert " ;")))
+
+
+#+END_SRC
+
+* Mise en page html : typographie : espaces  + guillemets
+
+#+BEGIN_SRC emacs-lisp
+(defun cca-insecable()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#xa0))
+
+(defun cca-fine-secable()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x2009))
+
+(defun cca-fine-insecable()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x202f))
+
+
+(defun cca-tiret-cadratin()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x2014))
+
+(defun cca-tiret-demi-cadratin()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x2013))
+
+
+
+#+END_SRC
+
+* Mise en page html : typographie : autres signes
+#+BEGIN_SRC emacs-lisp
+
+(defun cca-left()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x201c))
+
+(defun cca-right()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x201d))
+
+(defun cca-left-single()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x2018))
+
+(defun cca-right-single()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x2019))
+
+(defun cca-ampersand()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x026))
+
+(defun cca-apostrophe()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x2019))
+
+(defun cca-suspension()
+  (interactive)
+  (save-excursion)
+(ucs-insert '#x2026))
+
+#+END_SRC
+* Mise en page html : autres
+#+BEGIN_SRC emacs-lisp
+(defun cca-emem(d1 d2)
+  (interactive "r")
+  (save-excursion
+    (goto-char d2)(insert "</em>")
+    (goto-char d1)(insert "<em>")
+))
+
+(defun cca-sup-sup(deb fin)
+  "A partir d'une région sélectionnée, place <sup>au début et </sup> à la fin"
+  (interactive "r")
+  (save-excursion
+    (goto-char fin)(insert "</sup>")
+    (goto-char deb)(insert "<sup>")
+))
+
+
+(defun cca-aspan(deb fin)
+  (interactive "r")
+  (save-excursion
+    (goto-char fin)(insert "</span>")
+    (goto-char deb)(insert "<span class=\"\">")
+))
+
+(defun cca-link(d1 d2)
+  (interactive "r")
+  (save-excursion
+    (goto-char d2)(insert "</a>")
+    (goto-char d1)(insert "<a href=\"\">")
+))
+
+; Notes nda 
+
+(defun cca-cfa(d1 d2)
+(interactive "r")
+(save-excursion
+(goto-char d2)(insert "</cfa>")
+(goto-char d1)(insert "<cfa>")))
+
+(defun cca-nda(d1 d2)
+(interactive "r")
+(save-excursion
+(goto-char d2)(insert "</nda>")
+(goto-char d1)(insert "<nda>")))
+
+
+#+END_SRC
+* Mise en page html : misc
+#+BEGIN_SRC emacs-lisp
+
+;supprime le formatage en 70 colonnes
+(fset 'unwraptext
+   (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ([21 57 57 57 57 24 102 134217848 102 105 108 108 kp-subtract 114 101 103 105 111 105 110 backspace backspace 110 return] 0 "%d")) arg)))
+
+;supprime les lignes blanches multiples et ne laisse que des singletons de lignes blanches
+(defun single-lines-only ()
+  "replace multiple blank lines with a single one"
+  (interactive)
+  (goto-char (point-min))
+  (while (re-search-forward "\\(^\\s-*$\\)\n" nil t)
+    (replace-match "\n")
+    (forward-char 1)))
+
+; imprime les lettres de A à Z
+(defun a-to-z()
+  (interactive)
+  (let ((i 64))
+    (while (< i 90)
+      (setq i (+ i 1))
+      (insert (format "%c " i))))
+)
+
+
+#+END_SRC
+
+* Outils python
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+* Conversion chiffres lettres
+#+BEGIN_SRC emacs-lisp
+;;; Convertit en lettre les chiffres de 1 à 100.
+;;; Inspiré du programme convertissant en chiffre romain les nombres arabes
+
+(defun chiffre-lettre(envoi)
+       (cdr (assoc envoi nombre<->francais)))
+
+(defun chiffre-lettre-anglais(envoi)
+       (cdr (assoc envoi number<->english)))
+
+
+(defconst nombre<->francais
+'((1 . "Un")
+(2 . "Deux")
+(3 . "Trois")
+(4 . "Quatre")
+(5 . "Cinq")
+(6 . "Six")
+(7 . "Sept")
+(8 . "Huit")
+(9 . "Neuf")
+(10 . "Dix")
+(11 . "Onze")
+(12 . "Douze")
+(13 . "Treize")
+(14 . "Quatorze")
+(15 . "Quinze")
+(16 . "Seize")
+(17 . "Dix-sept")
+(18 . "Dix-huit")
+(19 . "Dix-neuf")
+(20 . "Vingt")
+(21 . "Vingt et un")
+(22 . "Vingt-deux")
+(23 . "Vingt-trois")
+(24 . "Vingt-quatre")
+(25 . "Vingt-cinq")
+(26 . "Vingt-six")
+(27 . "Vingt-sept")
+(28 . "Vingt-huit")
+(29 . "Vingt-neuf")
+(30 . "Trente")
+(31 . "Trente et un")
+(32 . "Trente-deux")
+(33 . "Trente-trois")
+(34 . "Trente-quatre")
+(35 . "Trente-cinq")
+(36 . "Trente-six")
+(37 . "Trente-sept")
+(38 . "Trente-huit")
+(39 . "Trente-neuf")
+(40 . "Quarante")
+(41 . "Quarante et un")
+(42 . "Quarante-deux")
+(43 . "Quarante-trois")
+(44 . "Quarante-quatre")
+(45 . "Quarante-cinq")
+(46 . "Quarante-six")
+(47 . "Quarante-sept")
+(48 . "Quarante-huit")
+(49 . "Quarante-neuf")
+(50 . "Cinquante")
+(51 . "Cinquante et un")
+(52 . "Cinquante-deux")
+(53 . "Cinquante-trois")
+(54 . "Cinquante-quatre")
+(55 . "Cinquante-cinq")
+(56 . "Cinquante-six")
+(57 . "Cinquante-sept")
+(58 . "Cinquante-huit")
+(59 . "Cinquante-neuf")
+(60 . "Soixante")
+(61 . "Soixante et un")
+(62 . "Soixante-deux")
+(63 . "Soixante-trois")
+(64 . "Soixante-quatre")
+(65 . "Soixante-cinq")
+(66 . "Soixante-six")
+(67 . "Soixante-sept")
+(68 . "Soixante-huit")
+(69 . "Soixante-neuf")
+(70 . "Soixante-dix")
+(71 . "Soixante-et-onze")
+(72 . "Soixante-douze")
+(73 . "Soixante-treize")
+(74 . "Soixante-quatorze")
+(75 . "Soixante-quinze")
+(76 . "Soixante-seize")
+(77 . "Soixante-dix-sept")
+(78 . "Soixante-dix-huit")
+(79 . "Soixante-dix-neuf")
+(80 . "Quatre-vingts")
+(81 . "Quatre-vingt-un")
+(82 . "Quatre-vingt-deux")
+(83 . "Quatre-vingt-trois")
+(84 . "Quatre-vingt-quatre")
+(85 . "Quatre-vingt-cinq")
+(86 . "Quatre-vingt-six")
+(87 . "Quatre-vingt-sept")
+(88 . "Quatre-vingt-huit")
+(89 . "Quatre-vingt-neuf")
+(90 . "Quatre-vingt-dix")
+(91 . "Quatre-vingt-onze")
+(92 . "Quatre-vingt-douze")
+(93 . "Quatre-vingt-treize")
+(94 . "Quatre-vingt-quatorze")
+(95 . "Quatre-vingt-quinze")
+(96 . "Quatre-vingt-seize")
+(97 . "Quatre-vingt-dix-sept")
+(98 . "Quatre-vingt-dix-huit")
+(99 . "Quatre-vingt-dix-neuf")
+(100 . "Cent")))
+
+(defconst number<->english
+'((1 . "One")
+(2 . "Two")
+(3 . "Three")
+(4 . "Four")
+(5 . "Five")
+(6 . "Six")
+(7 . "Seven")
+(8 . "Eight")
+(9 . "Nine")
+(10 . "Ten")
+(11 . "Eleven")
+(12 . "Twelve")
+(13 . "Thirteen")
+(14 . "Fourteen")
+(15 . "Fifteen")
+(16 . "Sixteen")
+(17 . "Seventeen")
+(18 . "Eighteen")
+(19 . "Nineteen")
+(20 . "Twenty")
+(21 . "Twenty-One")
+(22 . "Twenty-Two")
+(23 . "Twenty-Three")
+(24 . "Twenty-Four")
+(25 . "Twenty-Five")
+(26 . "Twenty-Six")
+(27 . "Twenty-Seven")
+(28 . "Twenty-Eight")
+(29 . "Twenty-Nine")
+(30 . "Thirty")
+(31 . "Thirty-One")
+(32 . "Thirty-Two")
+(33 . "Thirty-Three")
+(34 . "Thirty-Four")
+(35 . "Thirty-Five")
+(36 . "Thirty-Six")
+(37 . "Thirty-Seven")
+(38 . "Thirty-Eight")
+(39 . "Thirty-Nine")
+(40 . "Forty")
+(41 . "Forty-One")
+(42 . "Forty-Two")
+(43 . "Forty-Three")
+(44 . "Forty-Four")
+(45 . "Forty-Five")
+(46 . "Forty-Six")
+(47 . "Forty-Seven")
+(48 . "Forty-Eight")
+(49 . "Forty-Nine")
+(50 . "Fifty")
+(51 . "Fifty-One")
+(52 . "Fifty-Two")
+(53 . "Fifty-Three")
+(54 . "Fifty-Four")
+(55 . "Fifty-Five")
+(56 . "Fifty-Six")
+(57 . "Fifty-Seven")
+(58 . "Fifty-Eight")
+(59 . "Fifty-Nine")
+(60 . "Sixty")
+(61 . "Sixty-One")
+(62 . "Sixty-Two")
+(63 . "Sixty-Three")
+(64 . "Sixty-Four")
+(65 . "Sixty-Five")
+(66 . "Sixty-Six")
+(67 . "Sixty-Seven")
+(68 . "Sixty-Eight")
+(69 . "Sixty-Nine")
+(70 . "Seventy")
+(71 . "Seventy-One")
+(72 . "Seventy-Two")
+(73 . "Seventy-Three")
+(74 . "Seventy-Four")
+(75 . "Seventy-Five")
+(76 . "Seventy-Six")
+(77 . "Seventy-Seven")
+(78 . "Seventy-Eight")
+(79 . "Seventy-Nine")
+(80 . "Eighty")
+(81 . "Eighty-One")
+(82 . "Eighty-Two")
+(83 . "Eighty-Three")
+(84 . "Eighty-Four")
+(85 . "Eighty-Five")
+(86 . "Eighty-Six")
+(87 . "Eighty-Seven")
+(88 . "Eighty-Eight")
+(89 . "Eighty-Nine")
+(90 . "Ninety")
+(91 . "Ninety-One")
+(92 . "Ninety-Two")
+(93 . "Ninety-Three")
+(94 . "Ninety-Four")
+(95 . "Ninety-Five")
+(96 . "Ninety-Six")
+(97 . "Ninety-Seven")
+(98 . "Ninety-Eight")
+(99 . "Ninety-Nine")
+(100 . "Hundred")))
+
+#+END_SRC
+* Mise en page html : raccourcis
+#+BEGIN_SRC emacs-lisp
+; raccourcis
+(global-set-key (kbd "<f5>") 'cca-emem)
+;(global-set-key (kbd "<f6>") 'cca-dldt)
+;(global-set-key (kbd "<f7>") 'cca-dldd)
+(global-set-key (kbd "C-<kp-1>") 'cca-left) ; “
+(global-set-key (kbd "C-<kp-2>") 'cca-right) ; ”
+(global-set-key (kbd "C-<kp-4>") 'cca-left-single) ; ‘
+(global-set-key (kbd "C-<kp-5>") 'cca-right-single) ; ’
+(global-set-key (kbd "C-<kp-7>") 'cca-guillemet-ouvrant) ; «
+(global-set-key (kbd "C-<kp-8>") 'cca-guillemet-fermant) ; »
+(global-set-key (kbd "C-<kp-3>") 'cca-insecable) ;  
+(global-set-key (kbd "C-<kp-6>") 'cca-tiret-cadratin) ; —
+(global-set-key (kbd "C-<kp-9>") 'cca-suspension) ; …
+(global-set-key (kbd "C-<kp-0>") 'cca-parap)
+
+(global-set-key (kbd "M-<kp-decimal>") 'cca-link)
+(global-set-key (kbd "M-<kp-0>") 'cca-tdm)
+(global-set-key (kbd "M-<kp-1>") 'cca-h1)
+(global-set-key (kbd "M-<kp-2>") 'cca-h2)
+(global-set-key (kbd "M-<kp-3>") 'cca-h3)
+(global-set-key (kbd "M-<kp-4>") 'cca-h4)
+(global-set-key (kbd "M-<kp-5>") 'cca-h5)
+(global-set-key (kbd "M-<kp-6>") 'cca-h6)
+
+(global-set-key (kbd "M-<kp-7>") 'cca-sup-sup)
+(global-set-key (kbd "M-<kp-8>") 'cca-aspan)
+(global-set-key (kbd "M-<kp-9>") 'cca-gras)
+
+(global-set-key (kbd "M-<kp-divide>") 'cca-cfa)
+(global-set-key (kbd "M-<kp-multiply>") 'cca-nda)
+
+(global-set-key (kbd "C-!") 'cca-exclamation)
+(global-set-key (kbd "C-:") 'cca-deuxpoints)
+(global-set-key (kbd "C-;") 'cca-pointvirgule)
+; car clavier azerty donc pas de possibilité de "C-?"
+(global-set-key (kbd "C-,") 'cca-interrogation)
+
+
+#+END_SRC
+
+* Codes unicode
+
+|---------+--------|
+| Symbole | hex    |
+|---------+--------|
+| $       | U+0024 |
+| %       | U+0025 |
+| &       | U+0026 |
+|---------+--------|
+
+* Raccourcis globaux
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<f8>") 'ibuffer)
+;(global-set-key (kbd "<f6>") 'cca-dldt)
+;(global-set-key (kbd "<f7>") 'cca-dldd)
+
+#+END_SRC
+
+* webmode
+#+BEGIN_SRC emacs-lisp
+(defun cca-init-web-mode()
+  "github.com/gongzhitaao/dotemacs
+   sacha chua"
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-enable-current-element-highlight t)
+  (setq web-mode-style-padding 1)
+  (setq web-mode-script-padding 1)
+  (setq web-mode-block-padding 0)
+  (setq web-mode-enable-auto-pairing nil)
+  (setq web-mode-enable-current-element-highlight t)
+)
+
+(use-package web-mode
+  :ensure t
+  ;; :mode (("\\. \\(html\\|htm\\)\\'") ("\\.css\\'"))  
+  :mode (".html" ".html?" ".css")
+  :config
+  (add-hook 'web-mode-hook #'cca-init-web-mode))
+
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+
+;; (setq web-mode-engines-alist '(("php" . "\\.phtml\\'")))
+
+(setq web-mode-enable-current-column-highlight nil)
+(setq web-mode-enable-current-element-highlight nil)
+
+(use-package emmet-mode
+:ensure t
+:config
+(add-hook 'web-mode-hook 'emmet-mode))
+
+;;désactive la prévisualisation
+(setq emmet-preview-default nil)
+#+END_SRC
+* Colorations syntaxique des couleurs exprimées en hexa
+#+BEGIN_SRC elisp
+(defun xah-syntax-color-hex()
+  "http://ergoemacs.org/emacs/emacs_CSS_colors.html"
+  (interactive)
+  (font-lock-add-keywords
+   nil
+   '(("#[[:xdigit:]]\\{3\\}"
+      (0 (put-text-property
+	  (match-beginning 0)
+	  (match-end 0)
+	  'face (list :background
+		      (let* (
+			     (ms (match-string-no-properties 0))
+			     (r (substring ms 1 2))
+			     (g (substring ms 2 3))
+			     (b (substring ms 3 4)))
+			(concat "#" r r g g b b ))))))
+      ("#[[:xdigit:]]\\{6\\}"
+       (0 (put-text-property
+	   (match-beginning 0)
+	   (match-end 0)
+	   'face (list :background (match-string-no-properties 0)))))))
+  (font-lock-flush))
+
+(add-hook 'css-mode-hook 'xah-syntax-color-hex)
+(add-hook 'php-mode-hook 'xah-syntax-color-hex)
+(add-hook 'html-mode-hook 'xah-syntax-color-hex)
+
+
+#+END_SRC
+* Fichiers contenus dans dossier lisp
+#+BEGIN_SRC elisp
+;; fonctions perso
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+(load-library "music01")
+(load-library "lamp")
+(load-library "pao")
+(load-library "a2r")
+(load-library "les_miens")
+(load-library "loremx")
+(load-library "tempo")
+
+
+#+END_SRC
+
+* Company-web
+#+BEGIN_SRC elisp
+ (require 'company)
+ (require 'company-web-html)
+(setq company-tooltip-limit 20)
+(setq company-begin-commands '(self-insert-command))
+
+  (define-key web-mode-map (kbd "C-'") 'company-web-html)
+  (add-hook 'web-mode-hook (lambda ()
+                            (set (make-local-variable 'company-backends) '(company-web-html company-files))
+                            (company-mode t)))
+#+END_SRC  
+* Undo-tree
+#+BEGIN_SRC emacs-lisp
+;; sacha chua
+;;C-x u (undo-tree-visualize)
+(use-package undo-tree
+:diminish undo-tree-mode
+:config
+(progn
+(global-undo-tree-mode)
+(setq undo-tree-visualizer-timestamps t)
+(setq undo-tree-visualizer-diff t)))
+
+#+END_SRC
+* Unfill paragraph
+#+BEGIN_SRC emacs-lisp
+(defun sachaChuaUnfillParagraph (&optional region)
+(interactive (progn
+(barf-if-buffer-read-only)
+(list t)))
+(let ((fill-column (point-max)))
+(fill-paragraph nil region)))
+;;(bind-key "M-Q" 'sachaChuaUnfillParagraph)
+
+#+END_SRC
+* Rainbow delimiters
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-delimiters :disabled true)
+
+#+END_SRC
+* Php-mode
+#+BEGIN_SRC emacs-lisp
+ (require 'php-mode)
+
+#+END_SRC
+* sql-mode
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.sql\\'" . sql-mode))
+(autoload 'sql-mod "sql-mode"
+"Mode pour éditer des fichiers sql, configuration personnelle et artisanale." t)
+#+END_SRC
+* csv-mode
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
+(autoload 'csv-mode "csv-mode"
+  "Major mode for editing comma-separated value files." t)
+#+END_SRC
