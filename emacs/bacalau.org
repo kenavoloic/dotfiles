@@ -1,0 +1,829 @@
+#+TITLE: bacalau.org, septembre 2023
+#+STARTUP: content
+#+OPTIONS: toc:nil num:nil
+
+* use-package
+#+begin_src emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (eval-when-compile (require 'use-package))
+#+end_src
+
+#+begin_src emacs-lisp
+(setq use-package-always-ensure t
+      use-package-always-defer  nil)
+#+end_src
+
+#+begin_src elisp
+  (use-package auto-compile
+  :demand t
+  :config (auto-compile-on-load-mode))
+  (setq load-prefer-newer t)
+#+end_src
+
+#+begin_src elisp
+  (setq byte-compile-warnings '(cl-functions))
+  (setq warning-minimum-level :emergency)
+#+end_src
+* Recharge configuration
+#+BEGIN_SRC emacs-lisp
+(defun rechargeConfiguration()
+(interactive)
+(load-file "~/.emacs.d/init.el"))
+#+END_SRC
+
+* Fontes
+#+begin_src emacs-lisp
+  (defconst fonteParDefaut "Anonymous Pro")
+  (defconst monoParDefaut "Anonymous Pro")  
+  (defconst variableParDefaut "Cardo")
+  (set-face-attribute 'default nil :family monoParDefaut :height 240)
+  (set-face-attribute 'fixed-pitch nil :family monoParDefaut :height 240)
+  (set-face-attribute 'variable-pitch nil :family variableParDefaut :height 260)
+
+#+end_src
+
+* Interface
+** GUI
+#+begin_src emacs-lisp
+  (use-package emacs
+    :ensure nil
+    :defer nil
+    :config
+    (setq frame-title-format '("" (buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+    (setq inhibit-startup-screen        t
+	  inhibit-splash-screen         t
+	  show-paren-mode               1
+	  show-paren-delay              0
+	  scroll-bar-mode               -1
+	  ;;browser-url-browse-function   'browse-url-firefox
+	  browser-url-browse-function   'browse-url-chromium
+	  tab-width                     4
+	  transient-mark-mode        t
+	  mouse-wheel-follow-mouse      t
+	  scroll-step                   1
+	  scroll-conservatively         101
+	  mouse-wheel-scroll-amount     '(1)
+	  mouse-wheel-progressive-speed nil)
+    (menu-bar-mode -99)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    ;;(display-battery-mode 1)
+    (display-time)
+    (setq display-time-24hr-format t)
+    ;;(fset 'yes-or-no-p 'y-or-n-p)
+    (setq use-short-answers t)
+    (setq history-length 1000)
+
+    )
+  ;;(setq-default frame-title-format '("%b - Emacs"))
+#+end_src
+
+** windmove
+changement de fenêtre au moyen de SHIFT + flêche
+#+begin_src emacs-lisp
+
+  (when (fboundp 'windmove-default-keybindings)
+    (windmove-default-keybindings))
+#+end_src
+
+** calendrier
+https://github.com/pascalfleury/emacs-config/
+
+#+begin_src emacs-lisp
+  ;; Lundi est le premier jour de la semaine
+  (setq calendar-week-start-day 1)
+  (setq org-gcal-local-timezone "Europe/Paris")
+#+end_src
+
+** Themes 
+#+begin_src emacs-lisp
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+  ;;(load-theme 'fonce10 t)
+  (load-theme 'fonce12 t)
+#+end_src
+
+#+RESULTS:
+: t
+
+** all-the-icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :if (display-graphic-p))
+#+end_src
+
+https://github.com/iyefrat/all-the-icons-completion
+#+begin_src emacs-lisp
+;;(all-the-icons-completion-mode)
+#+end_src
+** all-the-icons-dired
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :config
+    (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+#+end_src
+** visual-line-mode
+https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init.el
+#+begin_src emacs-lisp
+  (add-hook 'text-mode-hook 'visual-line-mode)
+#+end_src
+** highlight
+https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init.el
+#+begin_src emacs-lisp
+  ;; (add-hook 'text-mode-hook #'hl-line-mode)
+  ;; (add-hook 'prog-mode-hook #'hl-line-mode)
+#+end_src
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Cursor-Display.html#index-highlight-current-line
+#+begin_src emacs-lisp
+  (global-hl-line-mode)
+#+end_src
+
+** calendrier
+#+begin_src emacs-lisp
+  (setq calendar-week-start-day 1)
+  (setq org-gcal-local-timezone "Europe/Paris")
+#+end_src
+
+
+* Outils (in/dé)crémente sous le curseur
+#+begin_src emacs-lisp
+  (defun incremente(&optional arg)
+    "Incrémenter le nombre sous le curseur"
+    (interactive "*p")
+    (let* ((bounds (bounds-of-thing-at-point 'word))
+	   (beg (car bounds))
+	   (end (cdr bounds))
+	   (num (string-to-number (buffer-substring beg end)))
+	   (incr (cond ((null arg) 1)
+		       ((listp arg) -1)
+		       (t arg)))
+	   (value (+ num incr)))
+      (delete-region beg end)
+      (insert (format "%d" value))))
+#+end_src
+#+begin_src emacs-lisp
+(defun plus()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point."))
+  (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
+(global-set-key (kbd "M-à") 'plus)
+#+end_src
+#+begin_src emacs-lisp
+(defun moins()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point."))
+  (replace-match (number-to-string (1- (string-to-number (match-string 0))))))
+(global-set-key (kbd "M-é") 'moins)
+#+end_src
+
+
+* Surligne les nombres
+#+begin_src emacs-lisp
+  (use-package highlight-numbers)
+  (add-hook 'prog-mode-hook 'highlight-numbers-mode)
+#+end_src
+
+* Recherche orthographique
+https://irfu.cea.fr/Pisp/vianney.lebouteiller/emacs.html
+#+begin_src emacs-lisp
+;;; https://irfu.cea.fr/Pisp/vianney.lebouteiller/emacs.html
+  (defun recherche-mot-dico()
+    "Recherche le mot sous le curseur dans cnrtl.fr "
+    (interactive)
+    (let (word)
+      (setq word
+	    (if (use-region-p)
+		(buffer-substring-no-properties (region-beginning) (region-end))
+	      (current-word)))
+      (setq word (replace-regexp-in-string " " "_" word))
+      (browse-url (concat "http://www.cnrtl.fr/definition/" word))
+  ))
+#+end_src
+
+#+RESULTS:
+: recherche-mot-dico
+
+* EPUB
+#+begin_src emacs-lisp
+  (use-package ox-epub
+  :after org
+  :commands (org-export-dispatch))
+#+end_src
+
+* Markdown
+#+begin_src emacs-lisp
+  (use-package ox-md
+  :ensure nil
+  :after org
+  :commands (org-export-dispatch))
+#+end_src
+
+* Rainbow-delimiters
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+  :hook ((emacs-lisp-mode lisp-mode racket-mode) . rainbow-delimiters-mode))
+#+end_src
+
+* json navigator
+#+begin_src emacs-lisp
+  (use-package json-navigator
+  :commands (json-navigator-navigate-after-point))
+#+end_src
+
+* company
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package company
+    :demand t
+    ;;:bind (:map company-active-map ("<tab>" . company-complete-selection))
+    :custom
+    (company-idle-delay 0)
+    (company-minimum-prefix-length 2)
+    (company-selection-wrap-around t)
+    (company-tng-configure-default) ;; mouvement avec la touche tab
+  )
+
+  (setq company-dabbred-downcase nil)
+
+  (add-hook 'after-init-hook 'global-company-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; (use-package company
+  ;;   :config
+  ;;   (setq company-idle-delay 0
+  ;;         company-minimum-prefix-length 2
+  ;;         company-selection-wrap-around t))
+
+  ;; (global-company-mode)
+
+  (use-package company-posframe
+    :config
+    (company-posframe-mode 1))
+#+end_src
+
+https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
+#+begin_src emacs-lisp
+  ;; (use-package company
+  ;; :demand t
+  ;; :hook (prog-mode . company-mode)
+  ;; :bind (:map company-active-map
+  ;;             ("<tab>" . company-complete-selection))
+
+  ;; :custom
+  ;; (company-backends '((company-capf company-dabbrev-code)))
+  ;; (company-idle-delay 0.2)
+  ;; (company-minimum-prefix-length 3)
+  ;; (company-tooltip-align-annotations t)
+  ;; (company-tooltip-limit 20)
+
+  ;; :config
+  ;; (setq lsp-completion-provider :capf))
+#+end_src
+
+https://github.com/iquiw/company-restclient
+#+begin_src emacs-lisp
+(use-package company-restclient)
+(add-to-list 'company-backends 'company-restclient)
+#+end_src
+
+#+RESULTS:
+| company-restclient | company-bbdb | company-semantic | company-cmake | company-capf | company-clang | company-files | (company-dabbrev-code company-gtags company-etags company-keywords) | company-oddmuse | company-dabbrev |
+
+* typographie : signes doubles
+** signes doubles
+  #+BEGIN_SRC emacs-lisp
+(defun cca-exclamation()
+  (interactive)
+  (save-excursion
+    (insert " !")))
+
+(defun cca-interrogation()
+  (interactive)
+  (save-excursion
+    (insert " ?")))
+
+(defun cca-deuxpoints()
+  (interactive)
+  (save-excursion
+    (insert " :")))
+
+(defun cca-pointvirgule()
+  (interactive)
+  (save-excursion
+    (insert " ;")))
+
+
+  #+END_SRC
+
+** espaces
+    #+BEGIN_SRC emacs-lisp
+;;; insert-char remplace ucs-insert depuis emacs 24
+    (defun cca-insecable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#xa0))
+
+    (defun cca-fine-secable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2009))
+
+    (defun cca-fine-insecable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x202f))
+
+
+    (defun cca-tiret-cadratin()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2014))
+
+    (defun cca-tiret-demi-cadratin()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2013))
+  #+END_SRC
+
+** ligatures et autres
+    #+BEGIN_SRC emacs-lisp
+
+(defun cca-ae()
+  (interactive)
+  (save-excursion)
+  (insert-char '#x00e6))
+ 
+(defun cca-oe()
+  (interactive)
+  (save-excursion)
+  (insert-char '#x0153))
+
+(defun cca-left()
+  (interactive)
+  (save-excursion)
+(insert-char '#x201c))
+
+(defun cca-right()
+  (interactive)
+  (save-excursion)
+(insert-char '#x201d))
+
+(defun cca-left-single()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2018))
+
+(defun cca-right-single()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2019))
+
+(defun cca-ampersand()
+  (interactive)
+  (save-excursion)
+(insert-char '#x026))
+
+(defun cca-apostrophe()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2019))
+
+(defun cca-suspension()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2026))
+
+  #+END_SRC
+
+* which-key  
+#+begin_src emacs-lisp
+(use-package which-key
+:config (which-key-mode))
+#+end_src
+  
+* vertico, savehist, marginalia, orderless
+#+begin_src emacs-lisp
+  (use-package vertico
+    :init
+    (vertico-mode)
+    (setq vertico-count 10)
+    (setq vertico-resize t)
+    (setq vertico-cycle t))
+
+
+  (use-package savehist
+    :init
+    (savehist-mode))
+
+  ;; (use-package orderless
+  ;;   :commands (orderless)
+  ;;   :custom (completion-styles '(orderless flex)))
+
+  (use-package marginalia
+    :after vertico
+    :ensure t
+    :custom
+    (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+    :init
+    (marginalia-mode))
+
+  (use-package orderless
+    :init
+    (setq completion-styles '(orderless basic)
+	  completion-category-defaults nil
+	  completion-category-overrides
+	  '((file (styles partial-completion)))))
+#+end_src
+
+* org
+#+BEGIN_SRC emacs-lisp
+  ;; (require 'org)
+  ;; ;;Utilisations des 3 petits points en lieu et place des ... d'origine
+  ;; (setq org-ellipsis " …")
+  ;; (setq org-src-fontify-natively t)
+  ;; (setq org-pretty-entities t)
+  ;; ;;Boulets dans org
+  ;; ;Toujours ouvrir un ficher avec les 
+  ;; (setq org-startup-folded t)
+  ;; (setq org-src-tab-acts-natively t)
+#+END_SRC
+
+#+begin_src emacs-lisp
+  (use-package org
+    :config
+    (setq org-startup-indented t
+	  org-ellipsis " ↲"
+	  org-hide-emphasis-markers t
+	  org-startup-with-inline-images t
+	  org-image-actual-width '(450)
+	  org-hide-block-startup nil
+	  org-catch-invisible-edits 'error
+	  org-cycle-separator-lines 0
+	  org-startup-with-latex-preview nil))
+#+end_src
+
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package org-appear
+    :hook (org-mode . org-appear-mode))
+#+end_src
+** org-modern : désactivé
+#+begin_src emacs-lisp
+  ;; (use-package org-modern)
+  ;; (with-eval-after-load 'org (global-org-modern-mode))
+#+end_src
+
+** Superstar
+#+begin_src emacs-lisp
+(use-package org-superstar
+:defer t
+:hook (org-mode . org-superstar-mode))
+#+end_src
+
+** Emphase en rouge
+#+begin_src emacs-lisp
+(setq org-emphasis-alist (quote (("=" (:foreground "red" :background "black")))))
+#+end_src
+** Fontify
+#+begin_src emacs-lisp
+(setq org-src-fontify-natively t)
+#+end_src
+
+** Indentation
+
+#+begin_src emacs-lisp
+(setq org-src-preserve-indentation t)
+#+end_src
+** ob-restclient
+#+begin_src emacs-lisp
+(use-package ob-restclient
+  :after org)
+#+end_src
+
+** couleurs org-mode
+https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org-mode
+#+begin_src emacs-lisp
+;; (defun cca-org-mode-hook()
+;;   `(set-face-attribute org-level-1 nil :foreground "blue")
+;;   `(set-face-attribute org-level-2 nil :foreground "yellow"))
+
+;; (add-hook 'org-mode-hook 'cca-org-mode-hook)
+  
+#+end_src
+
+#+RESULTS:
+
+* org-babel
+** patrons src-block
+#+begin_src emacs-lisp
+    (with-eval-after-load 'org
+    (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp\n"))
+    (add-to-list 'org-structure-template-alist '("sp" . "src python :results output\n"))
+    (add-to-list 'org-structure-template-alist '("sr" . "src R :results output\n"))
+    (add-to-list 'org-structure-template-alist '("sj" . "src js :results output\n"))
+    (add-to-list 'org-structure-template-alist '("sq" . "src sql\n")))
+#+end_src
+
+** Langages
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages 'org-babel-load-languages
+                                   '(
+                                         (C . t)
+                                         (R . t)
+                                         (awk . t)
+                                         (clojure    . t)
+                                         (dot . t)
+                                         (haskell   . t)
+					 (gnuplot . t)
+                                         (java  . t)
+                                         (js     . t)
+                                         (jupyter . t)
+                                         (latex . t)
+                                         (lilypond . t)
+                                         (lisp   . t)
+                                         (perl . t)
+                                         (php . t)
+                                         (plantuml . t)
+                                         (prolog . t)
+                                         (python . t)
+                                         (restclient . t)
+                                         (ruby . t)
+                                         (scheme . t)
+                                         (shell  . t)
+                                         (sql    . t)
+					     (sqlite . t)
+                                         ;;(csharp . t)
+                                         ;;(ein    . t)
+                                         ;;(scala . t)
+                                         ))
+  (setq org-confirm-babel-evaluate nil)
+  ;; https://sachachua.com/dotemacs => Diagrams and graphics
+  (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+#+end_src
+
+#+RESULTS:
+: ((jupyter-python . python) (dot . graphviz-dot) (php . php) (C . c) (C++ . c++) (asymptote . asy) (bash . sh) (beamer . latex) (calc . fundamental) (cpp . c++) (ditaa . artist) (desktop . conf-desktop) (dot . fundamental) (elisp . emacs-lisp) (ocaml . tuareg) (screen . shell-script) (shell . sh) (sqlite . sql) (toml . conf-toml))
+
+** Python
+#+begin_src emacs-lisp
+  (use-package python-mode
+    :ensure t
+    :hook (python-mode . lsp-deferred)
+    :custom
+    ;; NOTE: Set these if Python 3 is called "python3" on your system!
+    (python-shell-interpreter "python3")
+    (dap-python-executable "python3")
+    (dap-python-debugger 'debugpy)
+    :config
+    (require 'dap-python))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package pyvenv
+   :config
+   (pyvenv-mode t))
+#+end_src
+
+#+begin_src emacs-lisp
+  (setq org-babel-python-command "python3")
+  (setq org-babel-default-header-args:python
+		'((:results . "output")
+	  (:session . "none")
+	  (:shebang . "#!/usr/bin/env python3")
+	  (:flags  . "-i")))
+
+#+end_src
+
+#+begin_src emacs-lisp
+  (setq python-shell-completion-native-enable nil)
+#+end_src
+
+
+#+begin_src emacs-lisp
+;; use python-mode in jupyter-python code blocks
+(add-to-list 'org-structure-template-alist '("py" . "src jupyter-python"))
+#+end_src
+
+
+* Org mode en lieu et place de =scratch=
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src elisp
+  (setq-default initial-major-mode 'org-mode
+	      initial-scratch-message "#+TITLE: Buffer Scratch\n\n")
+#+end_src
+* org-reveal
+#+begin_src emacs-lisp
+(use-package ox-reveal)
+#+end_src
+
+#+RESULTS:
+
+* jupyter
+#+begin_src emacs-lisp
+  (use-package jupyter)
+#+end_src
+
+* code-cells : notebooks
+https://github.com/astoff/code-cells.el
+#+begin_src emacs-lisp
+(add-hook 'python-mode-hook 'code-cells-mode-maybe)
+#+end_src
+
+#+begin_src emacs-lisp
+(setq code-cells-convert-ipynb-style '(("pandoc" "--to" "ipynb" "--from" "org")
+                                       ("pandoc" "--to" "org" "--from" "ipynb")
+                                       (lambda () #'org-mode)))
+#+end_src
+
+#+RESULTS:
+| pandoc | --to | ipynb      | --from | org   |
+| pandoc | --to | org        | --from | ipynb |
+| lambda | nil  | #'org-mode |        |       |
+
+* ipynb-to-markdown
+https://emacs.stackexchange.com/questions/69559/opening-and-reading-a-jupyter-notebook-file
+#+begin_src emacs-lisp
+(use-package markdown-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+(defun ipynb-to-markdown (file)
+  (interactive "f")
+  (let* ((data (with-temp-buffer
+                 (insert-file-literally file)
+                 (json-parse-string (buffer-string)
+                                    :object-type 'alist
+                                    :array-type 'list)))
+         (metadata (alist-get 'metadata data))
+         (kernelspec (alist-get 'kernelspec metadata))
+         (language (alist-get 'language kernelspec)))
+    (pop-to-buffer "ipynb-as-markdown")
+    ;; (when (featurep 'markdown-mode)
+    ;;   (markdown-mode))
+    (dolist (c (alist-get 'cells data))
+      (let* ((contents (alist-get 'source c))
+             (outputs (alist-get 'outputs c)))
+        (pcase (alist-get 'cell_type c)
+          ("markdown"
+           (when contents
+             (mapcar #'insert contents)
+             (insert "\n\n")))
+          ("code"
+           (when contents
+             (insert "```")
+             (insert language)
+             (insert "\n")
+             (mapcar #'insert contents)
+             (insert "\n```\n\n")
+             (dolist (x outputs)
+               (when-let (text (alist-get 'text x))
+                 (insert "```stdout\n")
+                 (insert (mapconcat #'identity text ""))
+                 (insert "\n```\n\n"))
+               (when-let (data (alist-get 'data x))
+                 (when-let (im64 (alist-get 'image/png data))
+                   (let ((imdata (base64-decode-string im64)))
+                     (insert-image (create-image imdata 'png t)))))
+               (insert "\n\n")))))))))
+
+#+end_src
+
+#+RESULTS:
+: ipynb-to-markdown
+
+* slime
+https://github.com/slime/slime
+#+begin_src emacs-lisp
+(setq inferior-lisp-program "sbcl")
+#+end_src
+
+* magit
+#+begin_src emacs-lisp
+  (use-package magit
+  :bind
+  (("C-x g" . magit-status)))
+#+end_src
+
+* LeGlode
+#+begin_src emacs-lisp
+(defun leglode()
+(interactive)
+(save-excursion
+(insert "")))
+#+end_src
+
+* Kenavo
+#+begin_src emacs-lisp
+  (defun kenavo()
+  (interactive)
+  (save-excursion
+  (insert "")))
+#+end_src
+
+
+* sql-mariadb
+Enable SQL history
+#+begin_src emacs-lisp
+(setq sql-input-ring-file-name "~/.emacs_sql_history")
+(setq sql-input-ring-separator "\nGO\n")
+(setq sql-mysql-options '("-A" "-t" "-C" "-f" "-n"))
+(add-hook 'sql-interactive-mode-hook
+          (lambda ()
+            (sql-set-sqli-buffer-generally)))
+#+end_src
+
+* flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+  :init
+  (global-flycheck-mode t))
+
+  (use-package elisp-lint)
+#+end_src
+
+* flymake
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+#+begin_src emacs-lisp
+(use-package flymake
+  :defer t
+  :custom-face
+  (flymake-note ((t nil))))
+#+end_src
+
+* eglot
+#+begin_src emacs-lisp
+  ;; (use-package eglot
+  ;; :ensure t
+  ;; :hook
+  ;; ((python-mode . eglot-ensure))
+  ;; )
+#+end_src
+
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+#+begin_src emacs-lisp
+(use-package eglot
+  :commands eglot
+  :ensure t
+  :custom (eglot-autoshutdown t)
+  :hook ((python-mode . eglot-ensure))
+
+ (add-hook 'eglot-managed-mode-hook
+            #'(lambda ()
+                ;; Show flymake diagnostics first.
+                (setq eldoc-documentation-functions
+                      (cons #'flymake-eldoc-function
+                            (remove #'flymake-eldoc-function
+                                    eldoc-documentation-functions))))))
+#+end_src
+
+
+
+* rainbow delimiters
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
+* rainbow
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+  :init
+  (rainbow-mode))
+#+end_src
+
+
+* know-your-http-well
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+utilisations :
+M-X http-...
+
+#+begin_src emacs-lisp
+(use-package know-your-http-well
+  :commands (http-header
+	     http-method
+	     http-relation
+	     http-status-code
+	     media-type))
+
+#+end_src
+
+
+* eldoc
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+#+begin_src emacs-lisp
+(use-package eldoc
+  :diminish
+  :hook ((c-mode-common emacs-lisp-mode) . eldoc-mode)
+  :custom
+  (eldoc-echo-area-use-multiline-p 3)
+  (eldoc-echo-area-display-truncation-message nil))
+#+end_src
+
