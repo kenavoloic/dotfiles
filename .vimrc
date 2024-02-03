@@ -46,8 +46,8 @@ set expandtab
 " set colorcolumn=80
 "highlight ColorColumn ctermbg=235 guibg=#2c2d27
 "let &colorcolumn=join(range(81,999), ",")
-highlight ColorColumn ctermbg=magenta
-call matchadd('ColorColumn', '\%81v', 100)
+" highlight ColorColumn ctermbg=magenta
+" call matchadd('ColorColumn', '\%81v', 100)
 " Fixe la hauteur de la barre de commande
 set cmdheight=1
 """ Déplacement du curseur 

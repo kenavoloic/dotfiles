@@ -1,0 +1,1073 @@
+#+TITLE: bosco.org, février 2024
+#+STARTUP: content
+#+OPTIONS: toc:nil num:nil
+
+* use-package
+#+begin_src emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (eval-when-compile (require 'use-package))
+#+end_src
+
+#+begin_src emacs-lisp
+(setq use-package-always-ensure t
+      use-package-always-defer  nil)
+#+end_src
+
+#+begin_src elisp
+  (use-package auto-compile
+  :demand t
+  :config (auto-compile-on-load-mode))
+  (setq load-prefer-newer t)
+#+end_src
+
+#+begin_src elisp
+  (setq byte-compile-warnings '(cl-functions))
+  (setq warning-minimum-level :emergency)
+#+end_src
+* Recharge configuration
+#+BEGIN_SRC emacs-lisp
+(defun rechargeConfiguration()
+(interactive)
+(load-file "~/.emacs.d/init.el"))
+#+END_SRC
+
+* Fontes
+#+begin_src emacs-lisp
+  (defconst fonteParDefaut "Anonymous Pro")
+  (defconst monoParDefaut "Anonymous Pro")  
+  (defconst variableParDefaut "Cardo")
+  (set-face-attribute 'default nil :family monoParDefaut :height 240)
+  (set-face-attribute 'fixed-pitch nil :family monoParDefaut :height 240)
+  (set-face-attribute 'variable-pitch nil :family variableParDefaut :height 260)
+
+#+end_src
+
+* Interface
+** GUI
+#+begin_src emacs-lisp
+  (use-package emacs
+    :ensure nil
+    :defer nil
+    :config
+    (setq frame-title-format '("" (buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+    (setq inhibit-startup-screen        t
+	  inhibit-splash-screen         t
+	  show-paren-mode               1
+	  show-paren-delay              0
+	  scroll-bar-mode               -1
+	  ;;browser-url-browse-function   'browse-url-firefox
+	  browser-url-browse-function   'browse-url-chromium
+	  tab-width                     4
+	  transient-mark-mode        t
+	  mouse-wheel-follow-mouse      t
+	  scroll-step                   1
+	  scroll-conservatively         101
+	  mouse-wheel-scroll-amount     '(1)
+	  mouse-wheel-progressive-speed nil)
+    (menu-bar-mode -99)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    ;;(display-battery-mode 1)
+    (display-time)
+    (setq display-time-24hr-format t)
+    ;;(fset 'yes-or-no-p 'y-or-n-p)
+    (setq use-short-answers t)
+    (setq history-length 1000)
+
+    )
+  ;;(setq-default frame-title-format '("%b - Emacs"))
+#+end_src
+
+** windmove
+changement de fenêtre au moyen de SHIFT + flêche
+#+begin_src emacs-lisp
+
+  (when (fboundp 'windmove-default-keybindings)
+    (windmove-default-keybindings))
+#+end_src
+
+** calendrier
+https://github.com/pascalfleury/emacs-config/
+
+#+begin_src emacs-lisp
+  ;; Lundi est le premier jour de la semaine
+  (setq calendar-week-start-day 1)
+  (setq org-gcal-local-timezone "Europe/Paris")
+#+end_src
+
+** Themes 
+#+begin_src emacs-lisp
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+  ;;(load-theme 'fonce10 t)
+  (load-theme 'fonce12 t)
+#+end_src
+
+#+RESULTS:
+: t
+
+** all-the-icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :if (display-graphic-p))
+#+end_src
+
+https://github.com/iyefrat/all-the-icons-completion
+#+begin_src emacs-lisp
+;;(all-the-icons-completion-mode)
+#+end_src
+** all-the-icons-dired
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :config
+    (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+#+end_src
+** visual-line-mode
+https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init.el
+#+begin_src emacs-lisp
+  (add-hook 'text-mode-hook 'visual-line-mode)
+#+end_src
+** highlight
+https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init.el
+#+begin_src emacs-lisp
+  ;; (add-hook 'text-mode-hook #'hl-line-mode)
+  ;; (add-hook 'prog-mode-hook #'hl-line-mode)
+#+end_src
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Cursor-Display.html#index-highlight-current-line
+#+begin_src emacs-lisp
+  (global-hl-line-mode)
+#+end_src
+
+** calendrier
+#+begin_src emacs-lisp
+  (setq calendar-week-start-day 1)
+  (setq org-gcal-local-timezone "Europe/Paris")
+#+end_src
+
+
+* Outils (in/dé)crémente sous le curseur
+#+begin_src emacs-lisp
+  (defun incremente(&optional arg)
+    "Incrémenter le nombre sous le curseur"
+    (interactive "*p")
+    (let* ((bounds (bounds-of-thing-at-point 'word))
+	   (beg (car bounds))
+	   (end (cdr bounds))
+	   (num (string-to-number (buffer-substring beg end)))
+	   (incr (cond ((null arg) 1)
+		       ((listp arg) -1)
+		       (t arg)))
+	   (value (+ num incr)))
+      (delete-region beg end)
+      (insert (format "%d" value))))
+#+end_src
+#+begin_src emacs-lisp
+(defun plus()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point."))
+  (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
+(global-set-key (kbd "M-à") 'plus)
+#+end_src
+#+begin_src emacs-lisp
+(defun moins()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point."))
+  (replace-match (number-to-string (1- (string-to-number (match-string 0))))))
+(global-set-key (kbd "M-é") 'moins)
+#+end_src
+
+
+* Surligne les nombres
+#+begin_src emacs-lisp
+  (use-package highlight-numbers)
+  (add-hook 'prog-mode-hook 'highlight-numbers-mode)
+#+end_src
+
+* Recherche orthographique
+https://irfu.cea.fr/Pisp/vianney.lebouteiller/emacs.html
+#+begin_src emacs-lisp
+;;; https://irfu.cea.fr/Pisp/vianney.lebouteiller/emacs.html
+  (defun recherche-mot-dico()
+    "Recherche le mot sous le curseur dans cnrtl.fr "
+    (interactive)
+    (let (word)
+      (setq word
+	    (if (use-region-p)
+		(buffer-substring-no-properties (region-beginning) (region-end))
+	      (current-word)))
+      (setq word (replace-regexp-in-string " " "_" word))
+      (browse-url (concat "http://www.cnrtl.fr/definition/" word))
+  ))
+#+end_src
+
+#+RESULTS:
+: recherche-mot-dico
+
+* EPUB
+https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
+#+begin_src emacs-lisp
+  (use-package ox-epub
+  :after org
+  :commands (org-export-dispatch))
+#+end_src
+
+* Markdown
+#+begin_src emacs-lisp
+  (use-package ox-md
+  :ensure nil
+  :after org
+  :commands (org-export-dispatch))
+#+end_src
+
+* Rainbow-delimiters
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+  :hook ((emacs-lisp-mode lisp-mode racket-mode) . rainbow-delimiters-mode))
+#+end_src
+
+* json navigator
+#+begin_src emacs-lisp
+  (use-package json-navigator
+  :commands (json-navigator-navigate-after-point))
+#+end_src
+
+* company
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package company
+    :demand t
+    ;;:bind (:map company-active-map ("<tab>" . company-complete-selection))
+    :custom
+    (company-idle-delay 0)
+    (company-minimum-prefix-length 2)
+    (company-selection-wrap-around t)
+    (company-tng-configure-default) ;; mouvement avec la touche tab
+  )
+
+  (setq company-dabbred-downcase nil)
+
+  (add-hook 'after-init-hook 'global-company-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; (use-package company
+  ;;   :config
+  ;;   (setq company-idle-delay 0
+  ;;         company-minimum-prefix-length 2
+  ;;         company-selection-wrap-around t))
+
+  ;; (global-company-mode)
+
+  (use-package company-posframe
+    :config
+    (company-posframe-mode 1))
+#+end_src
+
+https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
+#+begin_src emacs-lisp
+  ;; (use-package company
+  ;; :demand t
+  ;; :hook (prog-mode . company-mode)
+  ;; :bind (:map company-active-map
+  ;;             ("<tab>" . company-complete-selection))
+
+  ;; :custom
+  ;; (company-backends '((company-capf company-dabbrev-code)))
+  ;; (company-idle-delay 0.2)
+  ;; (company-minimum-prefix-length 3)
+  ;; (company-tooltip-align-annotations t)
+  ;; (company-tooltip-limit 20)
+
+  ;; :config
+  ;; (setq lsp-completion-provider :capf))
+#+end_src
+
+https://github.com/iquiw/company-restclient
+#+begin_src emacs-lisp
+(use-package company-restclient)
+(add-to-list 'company-backends 'company-restclient)
+#+end_src
+
+#+RESULTS:
+| company-restclient | company-bbdb | company-semantic | company-cmake | company-capf | company-clang | company-files | (company-dabbrev-code company-gtags company-etags company-keywords) | company-oddmuse | company-dabbrev |
+
+* typographie : signes doubles
+** signes doubles
+  #+BEGIN_SRC emacs-lisp
+(defun cca-exclamation()
+  (interactive)
+  (save-excursion
+    (insert " !")))
+
+(defun cca-interrogation()
+  (interactive)
+  (save-excursion
+    (insert " ?")))
+
+(defun cca-deuxpoints()
+  (interactive)
+  (save-excursion
+    (insert " :")))
+
+(defun cca-pointvirgule()
+  (interactive)
+  (save-excursion
+    (insert " ;")))
+
+
+  #+END_SRC
+
+** espaces
+    #+BEGIN_SRC emacs-lisp
+;;; insert-char remplace ucs-insert depuis emacs 24
+    (defun cca-insecable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#xa0))
+
+    (defun cca-fine-secable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2009))
+
+    (defun cca-fine-insecable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x202f))
+
+
+    (defun cca-tiret-cadratin()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2014))
+
+    (defun cca-tiret-demi-cadratin()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2013))
+  #+END_SRC
+
+** ligatures et autres
+    #+BEGIN_SRC emacs-lisp
+
+(defun cca-ae()
+  (interactive)
+  (save-excursion)
+  (insert-char '#x00e6))
+ 
+(defun cca-oe()
+  (interactive)
+  (save-excursion)
+  (insert-char '#x0153))
+
+(defun cca-left()
+  (interactive)
+  (save-excursion)
+(insert-char '#x201c))
+
+(defun cca-right()
+  (interactive)
+  (save-excursion)
+(insert-char '#x201d))
+
+(defun cca-left-single()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2018))
+
+(defun cca-right-single()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2019))
+
+(defun cca-ampersand()
+  (interactive)
+  (save-excursion)
+(insert-char '#x026))
+
+(defun cca-apostrophe()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2019))
+
+(defun cca-suspension()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2026))
+
+  #+END_SRC
+
+* which-key  
+#+begin_src emacs-lisp
+(use-package which-key
+:config (which-key-mode))
+#+end_src
+  
+* vertico, savehist, marginalia, orderless
+#+begin_src emacs-lisp
+  (use-package vertico
+    :init
+    (vertico-mode)
+    (setq vertico-count 10)
+    (setq vertico-resize t)
+    (setq vertico-cycle t))
+
+
+  (use-package savehist
+    :init
+    (savehist-mode))
+
+  ;; (use-package orderless
+  ;;   :commands (orderless)
+  ;;   :custom (completion-styles '(orderless flex)))
+
+  (use-package marginalia
+    :after vertico
+    :ensure t
+    :custom
+    (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+    :init
+    (marginalia-mode))
+
+  (use-package orderless
+    :init
+    (setq completion-styles '(orderless basic)
+	  completion-category-defaults nil
+	  completion-category-overrides
+	  '((file (styles partial-completion)))))
+#+end_src
+
+* org
+#+BEGIN_SRC emacs-lisp
+  ;; (require 'org)
+  ;; ;;Utilisations des 3 petits points en lieu et place des ... d'origine
+  ;; (setq org-ellipsis " …")
+  ;; (setq org-src-fontify-natively t)
+  ;; (setq org-pretty-entities t)
+  ;; ;;Boulets dans org
+  ;; ;Toujours ouvrir un ficher avec les 
+  ;; (setq org-startup-folded t)
+  ;; (setq org-src-tab-acts-natively t)
+#+END_SRC
+
+#+begin_src emacs-lisp
+  (use-package org
+    :config
+    (setq org-startup-indented t
+	  org-ellipsis " ↲"
+	  org-hide-emphasis-markers t
+	  org-startup-with-inline-images t
+	  org-image-actual-width '(450)
+	  org-hide-block-startup nil
+	  org-catch-invisible-edits 'error
+	  org-cycle-separator-lines 0
+	  org-startup-with-latex-preview nil
+	  org-export-with-smart-quotes t)) ; transforme ' en ’ au moment de l'export
+#+end_src
+
+#+RESULTS:
+: t
+
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package org-appear
+    :hook (org-mode . org-appear-mode))
+#+end_src
+
+** Visual-line mode
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook (lambda () (visual-line-mode 1)))
+
+#+end_src
+
+#+RESULTS:
+| (lambda nil (visual-line-mode 1)) | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | org-tempo-setup | jupyter-org-interaction-mode | org-superstar-mode | org-appear-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | org-babel-jupyter-make-local-aliases |
+
+** org-modern : désactivé
+#+begin_src emacs-lisp
+  ;; (use-package org-modern)
+  ;; (with-eval-after-load 'org (global-org-modern-mode))
+#+end_src
+
+** Superstar
+#+begin_src emacs-lisp
+(use-package org-superstar
+:defer t
+:hook (org-mode . org-superstar-mode))
+#+end_src
+
+** Emphase en rouge
+#+begin_src emacs-lisp
+(setq org-emphasis-alist (quote (("=" (:foreground "red" :background "black")))))
+#+end_src
+** Fontify
+#+begin_src emacs-lisp
+(setq org-src-fontify-natively t)
+#+end_src
+
+** Indentation
+
+#+begin_src emacs-lisp
+(setq org-src-preserve-indentation t)
+#+end_src
+** ob-restclient
+#+begin_src emacs-lisp
+(use-package ob-restclient
+  :after org)
+#+end_src
+
+** couleurs org-mode
+https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org-mode
+#+begin_src emacs-lisp
+;; (defun cca-org-mode-hook()
+;;   `(set-face-attribute org-level-1 nil :foreground "blue")
+;;   `(set-face-attribute org-level-2 nil :foreground "yellow"))
+
+;; (add-hook 'org-mode-hook 'cca-org-mode-hook)
+  
+#+end_src
+
+#+RESULTS:
+
+* org-babel
+** patrons src-block
+#+begin_src emacs-lisp
+    (with-eval-after-load 'org
+    (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp\n"))
+    (add-to-list 'org-structure-template-alist '("sp" . "src python :results output\n"))
+    (add-to-list 'org-structure-template-alist '("sr" . "src R :results output\n"))
+    (add-to-list 'org-structure-template-alist '("sj" . "src js :results output\n"))
+    (add-to-list 'org-structure-template-alist '("sq" . "src sql\n")))
+#+end_src
+
+** Langages
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages 'org-babel-load-languages
+                                   '(
+                                         (C . t)
+                                         (R . t)
+                                         (awk . t)
+                                         (clojure    . t)
+                                         (dot . t)
+                                         (haskell   . t)
+					 (gnuplot . t)
+                                         (java  . t)
+                                         (js     . t)
+                                         (jupyter . t)
+                                         (latex . t)
+                                         (lilypond . t)
+                                         (lisp   . t)
+                                         (perl . t)
+                                         (php . t)
+                                         (plantuml . t)
+                                         (prolog . t)
+                                         (python . t)
+                                         (restclient . t)
+                                         (ruby . t)
+					 (sass . t)
+                                         (scheme . t)
+                                         (shell  . t)
+                                         (sql    . t)
+					     (sqlite . t)
+                                         ;;(csharp . t)
+                                         ;;(ein    . t)
+                                         ;;(scala . t)
+                                         ))
+  (setq org-confirm-babel-evaluate nil)
+  ;; https://sachachua.com/dotemacs => Diagrams and graphics
+  (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+#+end_src
+
+#+RESULTS:
+: ((jupyter-python . python) (dot . graphviz-dot) (php . php) (C . c) (C++ . c++) (asymptote . asy) (bash . sh) (beamer . latex) (calc . fundamental) (cpp . c++) (ditaa . artist) (desktop . conf-desktop) (dot . fundamental) (elisp . emacs-lisp) (ocaml . tuareg) (screen . shell-script) (shell . sh) (sqlite . sql) (toml . conf-toml))
+
+** Python
+#+begin_src emacs-lisp
+  (use-package python-mode
+    :ensure t
+    :hook (python-mode . lsp-deferred)
+    :custom
+    ;; NOTE: Set these if Python 3 is called "python3" on your system!
+    (python-shell-interpreter "python3")
+    (dap-python-executable "python3")
+    (dap-python-debugger 'debugpy)
+    :config
+    (require 'dap-python))
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; (use-package pyvenv
+  ;;  :config
+  ;;  (pyvenv-mode t))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package pyvenv
+  :ensure t
+  :config (pyvenv-mode t)
+  ;; Set correct Python interpreter
+  (setq pyvenv-post-activate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
+  (setq pyvenv-post-deactivate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter "python3")))))
+#+end_src
+
+
+#+begin_src emacs-lisp
+  (setq org-babel-python-command "python3")
+  (setq org-babel-default-header-args:python
+		'((:results . "output")
+	  (:session . "none")
+	  (:shebang . "#!/usr/bin/env python3")
+	  (:flags  . "-i")))
+
+#+end_src
+
+#+begin_src emacs-lisp
+  (setq python-shell-completion-native-enable nil)
+#+end_src
+
+
+#+begin_src emacs-lisp
+;; use python-mode in jupyter-python code blocks
+(add-to-list 'org-structure-template-alist '("py" . "src jupyter-python"))
+#+end_src
+
+#+begin_src emacs-lisp
+;; active cet environnement virtuel par défaut
+(pyvenv-activate "~/envirs/env01/")
+#+end_src
+
+
+* org-tempo
+#+begin_src emacs-lisp
+(use-package org-tempo
+  :demand t
+  :ensure nil
+  :config (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
+#+end_src
+
+#+RESULTS:
+: t
+* Org mode en lieu et place de =scratch=
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src elisp
+  (setq-default initial-major-mode 'org-mode
+	      initial-scratch-message "#+TITLE: Buffer Scratch\n\n")
+#+end_src
+* org-reveal
+#+begin_src emacs-lisp
+(use-package ox-reveal)
+#+end_src
+
+#+RESULTS:
+
+* jupyter
+#+begin_src emacs-lisp
+  (use-package jupyter
+    :straight t)
+#+end_src
+
+#+RESULTS:
+
+* code-cells : notebooks
+https://github.com/astoff/code-cells.el
+#+begin_src emacs-lisp
+(add-hook 'python-mode-hook 'code-cells-mode-maybe)
+#+end_src
+
+#+begin_src emacs-lisp
+(setq code-cells-convert-ipynb-style '(("pandoc" "--to" "ipynb" "--from" "org")
+                                       ("pandoc" "--to" "org" "--from" "ipynb")
+                                       (lambda () #'org-mode)))
+#+end_src
+
+#+RESULTS:
+| pandoc | --to | ipynb      | --from | org   |
+| pandoc | --to | org        | --from | ipynb |
+| lambda | nil  | #'org-mode |        |       |
+
+* ipynb-to-markdown
+https://emacs.stackexchange.com/questions/69559/opening-and-reading-a-jupyter-notebook-file
+#+begin_src emacs-lisp
+(use-package markdown-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+(defun ipynb-to-markdown (file)
+  (interactive "f")
+  (let* ((data (with-temp-buffer
+                 (insert-file-literally file)
+                 (json-parse-string (buffer-string)
+                                    :object-type 'alist
+                                    :array-type 'list)))
+         (metadata (alist-get 'metadata data))
+         (kernelspec (alist-get 'kernelspec metadata))
+         (language (alist-get 'language kernelspec)))
+    (pop-to-buffer "ipynb-as-markdown")
+    ;; (when (featurep 'markdown-mode)
+    ;;   (markdown-mode))
+    (dolist (c (alist-get 'cells data))
+      (let* ((contents (alist-get 'source c))
+             (outputs (alist-get 'outputs c)))
+        (pcase (alist-get 'cell_type c)
+          ("markdown"
+           (when contents
+             (mapcar #'insert contents)
+             (insert "\n\n")))
+          ("code"
+           (when contents
+             (insert "```")
+             (insert language)
+             (insert "\n")
+             (mapcar #'insert contents)
+             (insert "\n```\n\n")
+             (dolist (x outputs)
+               (when-let (text (alist-get 'text x))
+                 (insert "```stdout\n")
+                 (insert (mapconcat #'identity text ""))
+                 (insert "\n```\n\n"))
+               (when-let (data (alist-get 'data x))
+                 (when-let (im64 (alist-get 'image/png data))
+                   (let ((imdata (base64-decode-string im64)))
+                     (insert-image (create-image imdata 'png t)))))
+               (insert "\n\n")))))))))
+
+#+end_src
+
+#+RESULTS:
+: ipynb-to-markdown
+
+* slime
+https://github.com/slime/slime
+#+begin_src emacs-lisp
+(setq inferior-lisp-program "sbcl")
+#+end_src
+
+* magit
+#+begin_src emacs-lisp
+  (use-package magit
+  :bind
+  (("C-x g" . magit-status)))
+#+end_src
+
+* sql-mariadb
+Enable SQL history
+#+begin_src emacs-lisp
+(setq sql-input-ring-file-name "~/.emacs_sql_history")
+(setq sql-input-ring-separator "\nGO\n")
+(setq sql-mysql-options '("-A" "-t" "-C" "-f" "-n"))
+(add-hook 'sql-interactive-mode-hook
+          (lambda ()
+            (sql-set-sqli-buffer-generally)))
+#+end_src
+
+* flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+  :init
+  (global-flycheck-mode t))
+
+  (use-package elisp-lint)
+#+end_src
+
+* flymake
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+#+begin_src emacs-lisp
+(use-package flymake
+  :defer t
+  :custom-face
+  (flymake-note ((t nil))))
+#+end_src
+
+* eglot
+#+begin_src emacs-lisp
+  ;; (use-package eglot
+  ;; :ensure t
+  ;; :hook
+  ;; ((python-mode . eglot-ensure))
+  ;; )
+#+end_src
+
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+#+begin_src emacs-lisp
+(use-package eglot
+  :commands eglot
+  :ensure t
+  :custom (eglot-autoshutdown t)
+  :hook ((python-mode . eglot-ensure))
+
+ (add-hook 'eglot-managed-mode-hook
+            #'(lambda ()
+                ;; Show flymake diagnostics first.
+                (setq eldoc-documentation-functions
+                      (cons #'flymake-eldoc-function
+                            (remove #'flymake-eldoc-function
+                                    eldoc-documentation-functions))))))
+#+end_src
+
+
+
+* rainbow delimiters
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
+* rainbow
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+  :init
+  (rainbow-mode))
+#+end_src
+
+
+* know-your-http-well
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+utilisations :
+M-X http-...
+
+#+begin_src emacs-lisp
+(use-package know-your-http-well
+  :commands (http-header
+	     http-method
+	     http-relation
+	     http-status-code
+	     media-type))
+
+#+end_src
+
+
+* eldoc
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+#+begin_src emacs-lisp
+(use-package eldoc
+  :diminish
+  :hook ((c-mode-common emacs-lisp-mode) . eldoc-mode)
+  :custom
+  (eldoc-echo-area-use-multiline-p 3)
+  (eldoc-echo-area-display-truncation-message nil))
+#+end_src
+
+* plantuml
+#+begin_src emacs-lisp
+(setq org-plantuml-exec-mode 'plantuml)
+;;(setq org-plantuml-executable-path "~/.config/plantuml.jar")
+(setq org-plantuml-jar-path (expand-file-name "/usr/share/plantuml/plantuml.jar"))
+
+#+end_src
+
+#+RESULTS:
+: /usr/share/plantuml/plantuml.jar
+
+* org-ai
+#+begin_src emacs-lisp
+;; (use-package org-ai
+;;   :ensure t
+;;   :commands (org-ai-mode
+;; 	     org-ai-global-mode)
+;;   :init
+;;   (add-hook 'org-mode-hook #'org-ai-mode))
+
+;; (setq org-ai-default-chat-model "gpt-3.5") 
+#+end_src
+* chatgp-shell
+#+begin_src emacs-lisp
+;; (use-package chatgpt-shell
+;;   :ensure t
+;;   :custom
+;;   ((chatgpt-shell-openai-key
+;;     (lambda () (auth-source-pass-get 'secret "")))))
+#+end_src
+
+* Auth-source
+#+begin_src emacs-lisp
+(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc"))
+
+#+end_src
+
+* reddit : md4rd
+#+begin_src emacs-lisp
+(use-package md4rd
+  :ensure t
+  (add-hook 'md4rd-mode-hook 'md4rd-indent-all-the-lines))
+
+#+end_src
+
+#+begin_src emacs-lisp
+(setq md4rd-subs-active '(emacs orgmode bordeaux dataisbeautiful datasets debian jazzguitar jazztheory pythoncoding))
+
+#+end_src
+#+RESULTS:
+| emacs | orgmode | bordeaux | dataisbeautiful | datasets | debian | jazzguitar | jazztheory | pythoncoding |
+
+
+* bitlbee
+
+#+begin_src emacs-lisp
+(use-package bitlbee)
+
+#+end_src
+
+* w3m
+Pour supercollider-emacs
+#+begin_src emacs-lisp
+(eval-after-load "w3m"
+  '(progn
+     (define-key w3m-mode-map [left] 'backward-char)
+     (define-key w3m-mode-map [right] 'forward-char)
+     (define-key w3m-mode-map [up] 'previous-line)
+     (define-key w3m-mode-map [down] 'next-line)))
+
+#+end_src
+
+* org-latex
+https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
+
+** Exporting to PDF
+- I want to produce PDFs with syntax highlighting in the code. The best way to do that seems to be with the =minted= package, but that package shells out to =pygments= to do the actual work. xelatex usually disallows shell commands; this enables that.
+- Include the listings package in all of my LaTeX exports.
+- Remove the intermediate TeX file when exporting to PDF.
+
+#+begin_src emacs-lisp
+(use-package ox-latex
+  :ensure-system-package latexmk
+  :ensure nil
+  :after org
+  :commands (org-export-dispatch)
+
+  :custom
+  (org-latex-pdf-process '("latexmk -xelatex -shell-escape -quiet -f %f"))
+
+  (org-latex-src-block-backend 'listings)
+  (org-latex-listings-options
+   '(("basicstyle" "\\ttfamily")
+     ("showstringspaces" "false")
+     ("keywordstyle" "\\color{blue}\\textbf")
+     ("commentstyle" "\\color{gray}")
+     ("stringstyle" "\\color{green!70!black}")
+     ("stringstyle" "\\color{red}")
+     ("frame" "single")
+     ("numbers" "left")
+     ("numberstyle" "\\ttfamily")
+     ("columns" "fullflexible")))
+
+  (org-latex-packages-alist '(("" "listings")
+                              ("" "booktabs")
+                              ("AUTO" "polyglossia" t ("xelatex" "lualatex"))
+                              ("" "grffile")
+                              ("" "unicode-math")
+                              ("" "xcolor")))
+
+  :config
+  (add-to-list 'org-latex-logfiles-extensions "tex"))
+
+#+end_src
+
+#+RESULTS:
+: t
+
+** Beamer
+Allow exporting presentations to beamer.
+
+#+begin_src emacs-lisp
+(use-package ox-beamer
+  :ensure nil
+  :after ox-latex)
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+(use-package auctex
+  :custom
+  (TeX-parse-self t)
+
+  :config
+  (TeX-global-PDF-mode 1)
+
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (LaTeX-math-mode)
+              (setq TeX-master t))))
+
+#+end_src
+
+#+RESULTS:
+: t
+
+* Garbage collector
+https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configuration.org
+
+Trigger garbage collection when I've been idle for five seconds and memory usage is over 16 MB.
+
+#+begin_src emacs-lisp
+  (use-package gcmh
+    :demand t
+
+    :init
+    (setq gcmh-idle-delay 5
+          gcmh-high-cons-threshold (* 16 1024 1024))
+    :config
+    (gcmh-mode))
+#+end_src
+
+#+RESULTS:
+: t
+
+
+* webmode
+#+begin_src emacs-lisp
+(use-package web-mode
+  :ensure t
+  :mode (".html" ".css" ".scss" ".jinja")
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-style-padding 1)
+  (web-mode-script-padding 1)
+  (web-mode-block-padding 0)
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-enable-auto-pairing t)
+  (web-mode-enable-css-colorization t))
+
+#+end_src
+
+#+RESULTS:
+: ((.scss . web-mode) (.css . web-mode) (.html . web-mode) (\.odc\' . archive-mode) (\.odf\' . archive-mode) (\.odi\' . archive-mode) (\.otp\' . archive-mode) (\.odp\' . archive-mode) (\.otg\' . archive-mode) (\.odg\' . archive-mode) (\.ots\' . archive-mode) (\.ods\' . archive-mode) (\.odm\' . archive-mode) (\.ott\' . archive-mode) (\.odt\' . archive-mode) (\.rtf$ . sclang-help-mode) (\.scd?\' . sclang-mode) (\.ly$ . LilyPond-mode) (\.asy$ . asy-mode) (\.hva\' . latex-mode) (\.ipynb\' . code-cells-convert-ipynb) (\.\(?:csd\|orc\|\(?:sc\|ud\)o\)\' . csound-mode) (\.dart\' . dart-mode) (docker-compose[^/]*\.ya?ml\' . docker-compose-mode) (\.dockerfile\' . dockerfile-mode) ([/\]\(?:Containerfile\|Dockerfile\)\(?:\.[^/\]*\)?\' . dockerfile-mode) (\.[Ss][Aa][Ss]\' . SAS-mode) (\.Sout\' . S-transcript-mode) (\.[Ss]t\' . S-transcript-mode) (\.Rd\' . Rd-mode) (DESCRIPTION\' . conf-colon-mode) (/Makevars\(\.win\)?\' . makefile-mode) (\.[Rr]out\' . ess-r-transcript-mode) (CITATION\' . ess-r-mode) (NAMESPACE\' . ess-r-mode) (\.[rR]profile\' . ess-r-mode) (\.[rR]\' . ess-r-mode) (/R/.*\.q\' . ess-r-mode) (\.[Jj][Aa][Gg]\' . ess-jags-mode) (\.[Bb][Mm][Dd]\' . ess-bugs-mode) (\.[Bb][Oo][Gg]\' . ess-bugs-mode) (\.[Bb][Uu][Gg]\' . ess-bugs-mode) (\.hsc\' . haskell-mode) (\.l[gh]s\' . haskell-literate-mode) (\.hsig\' . haskell-mode) (\.[gh]s\' . haskell-mode) (\.cabal\'\|/cabal\.project\|/\.cabal/config\' . haskell-cabal-mode) (\.chs\' . haskell-c2hs-mode) (\.ghci\' . ghci-script-mode) (\.dump-simpl\' . ghc-core-mode) (\.hcr\' . ghc-core-mode) (\.hs\' . haskell-tng-mode) (\(?:\(?:\.\(?:b\(?:\(?:abel\|ower\)rc\)\|json\(?:ld\)?\)\|composer\.lock\)\'\) . json-mode) (/git-rebase-todo\' . git-rebase-mode) (\.\(?:md\|markdown\|mkd\|mdown\|mkdn\|mdwn\)\' . markdown-mode) (\.\(?:php[s345]?\|phtml\)\' . php-mode-maybe) (\.\(?:php\.inc\|stub\)\' . php-mode) (/\.php_cs\(?:\.dist\)?\' . php-mode) (\.\(plantuml\|pum\|plu\)\' . plantuml-mode) (\.tsv\' . tsv-mode) (\.[Cc][Ss][Vv]\' . csv-mode) (\.\(scala\|sbt\|worksheet\.sc\)\' . scala-mode) (\.\(e?ya?\|ra\)ml\' . yaml-mode) (\.gpg\(~\|\.~[0-9]+~\)?\' nil epa-file) (\.elc\' . elisp-byte-code-mode) (\.zst\' nil jka-compr) (\.dz\' nil jka-compr) (\.xz\' nil jka-compr) (\.lzma\' nil jka-compr) (\.lz\' nil jka-compr) (\.g?z\' nil jka-compr) (\.bz2\' nil jka-compr) (\.Z\' nil jka-compr) (\.vr[hi]?\' . vera-mode) (\(?:\.\(?:rbw?\|ru\|rake\|thor\|jbuilder\|rabl\|gemspec\|podspec\)\|/\(?:Gem\|Rake\|Cap\|Thor\|Puppet\|Berks\|Brew\|Vagrant\|Guard\|Pod\)file\)\' . ruby-mode) (\.re?st\' . rst-mode) (\.py[iw]?\' . python-mode) (\.m\' . octave-maybe-mode) (\.less\' . less-css-mode) (\.scss\' . scss-mode) (\.cs\' . csharp-mode) (\.awk\' . awk-mode) (\.\(u?lpc\|pike\|pmod\(\.in\)?\)\' . pike-mode) (\.idl\' . idl-mode) (\.java\' . java-mode) (\.m\' . objc-mode) (\.ii\' . c++-mode) (\.i\' . c-mode) (\.lex\' . c-mode) (\.y\(acc\)?\' . c-mode) (\.h\' . c-or-c++-mode) (\.c\' . c-mode) (\.\(CC?\|HH?\)\' . c++-mode) (\.[ch]\(pp\|xx\|\+\+\)\' . c++-mode) (\.\(cc\|hh\)\' . c++-mode) (\.\(bat\|cmd\)\' . bat-mode) (\.[sx]?html?\(\.[a-zA-Z_]+\)?\' . mhtml-mode) (\.svgz?\' . image-mode) (\.svgz?\' . xml-mode) (\.x[bp]m\' . image-mode) (\.x[bp]m\' . c-mode) (\.p[bpgn]m\' . image-mode) (\.tiff?\' . image-mode) (\.gif\' . image-mode) (\.png\' . image-mode) (\.jpe?g\' . image-mode) (\.webp\' . image-mode) (\.te?xt\' . text-mode) (\.[tT]e[xX]\' . tex-mode) (\.ins\' . tex-mode) (\.ltx\' . latex-mode) (\.dtx\' . doctex-mode) (\.org\' . org-mode) (\.dir-locals\(?:-2\)?\.el\' . lisp-data-mode) (\.eld\' . lisp-data-mode) (eww-bookmarks\' . lisp-data-mode) (tramp\' . lisp-data-mode) (/archive-contents\' . lisp-data-mode) (places\' . lisp-data-mode) (\.emacs-places\' . lisp-data-mode) (\.el\' . emacs-lisp-mode) (Project\.ede\' . emacs-lisp-mode) (\.\(scm\|sls\|sld\|stk\|ss\|sch\)\' . scheme-mode) (\.l\' . lisp-mode) (\.li?sp\' . lisp-mode) (\.[fF]\' . fortran-mode) (\.for\' . fortran-mode) (\.p\' . pascal-mode) (\.pas\' . pascal-mode) (\.\(dpr\|DPR\)\' . delphi-mode) (\.\([pP]\([Llm]\|erl\|od\)\|al\)\' . perl-mode) (Imakefile\' . makefile-imake-mode) (Makeppfile\(?:\.mk\)?\' . makefile-makepp-mode) (\.makepp\' . makefile-makepp-mode) (\.mk\' . makefile-gmake-mode) (\.make\' . makefile-gmake-mode) ([Mm]akefile\' . makefile-gmake-mode) (\.am\' . makefile-automake-mode) (\.texinfo\' . texinfo-mode) (\.te?xi\' . texinfo-mode) (\.[sS]\' . asm-mode) (\.asm\' . asm-mode) (\.css\' . css-mode) (\.mixal\' . mixal-mode) (\.gcov\' . compilation-mode) (/\.[a-z0-9-]*gdbinit . gdb-script-mode) (-gdb\.gdb . gdb-script-mode) ([cC]hange\.?[lL]og?\' . change-log-mode) ([cC]hange[lL]og[-.][0-9]+\' . change-log-mode) (\$CHANGE_LOG\$\.TXT . change-log-mode) (\.scm\.[0-9]*\' . scheme-mode) (\.[ckz]?sh\'\|\.shar\'\|/\.z?profile\' . sh-mode) (\.bash\' . sh-mode) (/PKGBUILD\' . sh-mode) (\(/\|\`\)\.\(bash_\(profile\|history\|log\(in\|out\)\)\|z?log\(in\|out\)\)\' . sh-mode) (\(/\|\`\)\.\(shrc\|zshrc\|m?kshrc\|bashrc\|t?cshrc\|esrc\)\' . sh-mode) (\(/\|\`\)\.\([kz]shenv\|xinitrc\|startxrc\|xsession\)\' . sh-mode) (\.m?spec\' . sh-mode) (\.m[mes]\' . nroff-mode) (\.man\' . nroff-mode) (\.sty\' . latex-mode) (\.cl[so]\' . latex-mode) (\.bbl\' . latex-mode) (\.bib\' . bibtex-mode) (\.bst\' . bibtex-style-mode) (\.sql\' . sql-mode) (\(acinclude\|aclocal\|acsite\)\.m4\' . autoconf-mode) (\.m[4c]\' . m4-mode) (\.mf\' . metafont-mode) (\.mp\' . metapost-mode) (\.vhdl?\' . vhdl-mode) (\.article\' . text-mode) (\.letter\' . text-mode) (\.i?tcl\' . tcl-mode) (\.exp\' . tcl-mode) (\.itk\' . tcl-mode) (\.icn\' . icon-mode) (\.sim\' . simula-mode) (\.mss\' . scribe-mode) (\.f9[05]\' . f90-mode) (\.f0[38]\' . f90-mode) (\.indent\.pro\' . fundamental-mode) (\.\(pro\|PRO\)\' . idlwave-mode) (\.srt\' . srecode-template-mode) (\.prolog\' . prolog-mode) (\.tar\' . tar-mode) (\.\(arc\|zip\|lzh\|lha\|zoo\|[jew]ar\|xpi\|rar\|cbr\|7z\|squashfs\|ARC\|ZIP\|LZH\|LHA\|ZOO\|[JEW]AR\|XPI\|RAR\|CBR\|7Z\|SQUASHFS\)\' . archive-mode) (\.oxt\' . archive-mode) (\.\(deb\|[oi]pk\)\' . archive-mode) (\`/tmp/Re . text-mode) (/Message[0-9]*\' . text-mode) (\`/tmp/fol/ . text-mode) (\.oak\' . scheme-mode) (\.sgml?\' . sgml-mode) (\.x[ms]l\' . xml-mode) (\.dbk\' . xml-mode) (\.dtd\' . sgml-mode) (\.ds\(ss\)?l\' . dsssl-mode) (\.js[mx]?\' . javascript-mode) (\.har\' . javascript-mode) (\.json\' . js-json-mode) (\.[ds]?va?h?\' . verilog-mode) (\.by\' . bovine-grammar-mode) (\.wy\' . wisent-grammar-mode) (\.erts\' . erts-mode) ([:/\]\..*\(emacs\|gnus\|viper\)\' . emacs-lisp-mode) (\`\..*emacs\' . emacs-lisp-mode) ([:/]_emacs\' . emacs-lisp-mode) (/crontab\.X*[0-9]+\' . shell-script-mode) (\.ml\' . lisp-mode) (\.ld[si]?\' . ld-script-mode) (ld\.?script\' . ld-script-mode) (\.xs\' . c-mode) (\.x[abdsru]?[cnw]?\' . ld-script-mode) (\.zone\' . dns-mode) (\.soa\' . dns-mode) (\.asd\' . lisp-mode) (\.\(asn\|mib\|smi\)\' . snmp-mode) (\.\(as\|mi\|sm\)2\' . snmpv2-mode) (\.\(diffs?\|patch\|rej\)\' . diff-mode) (\.\(dif\|pat\)\' . diff-mode) (\.[eE]?[pP][sS]\' . ps-mode) (\.\(?:PDF\|EPUB\|CBZ\|FB2\|O?XPS\|DVI\|OD[FGPST]\|DOCX\|XLSX?\|PPTX?\|pdf\|epub\|cbz\|fb2\|o?xps\|djvu\|dvi\|od[fgpst]\|docx\|xlsx?\|pptx?\)\' . doc-view-mode-maybe) (configure\.\(ac\|in\)\' . autoconf-mode) (\.s\(v\|iv\|ieve\)\' . sieve-mode) (BROWSE\' . ebrowse-tree-mode) (\.ebrowse\' . ebrowse-tree-mode) (#\*mail\* . mail-mode) (\.g\' . antlr-mode) (\.mod\' . m2-mode) (\.ses\' . ses-mode) (\.docbook\' . sgml-mode) (\.com\' . dcl-mode) (/config\.\(?:bat\|log\)\' . fundamental-mode) (/\.\(authinfo\|netrc\)\' . authinfo-mode) (\.\(?:[iI][nN][iI]\|[lL][sS][tT]\|[rR][eE][gG]\|[sS][yY][sS]\)\' . conf-mode) (\.la\' . conf-unix-mode) (\.ppd\' . conf-ppd-mode) (java.+\.conf\' . conf-javaprop-mode) (\.properties\(?:\.[a-zA-Z0-9._-]+\)?\' . conf-javaprop-mode) (\.toml\' . conf-toml-mode) (\.desktop\' . conf-desktop-mode) (/\.redshift\.conf\' . conf-windows-mode) (\`/etc/\(?:DIR_COLORS\|ethers\|.?fstab\|.*hosts\|lesskey\|login\.?de\(?:fs\|vperm\)\|magic\|mtab\|pam\.d/.*\|permissions\(?:\.d/.+\)?\|protocols\|rpc\|services\)\' . conf-space-mode) (\`/etc/\(?:acpid?/.+\|aliases\(?:\.d/.+\)?\|default/.+\|group-?\|hosts\..+\|inittab\|ksysguarddrc\|opera6rc\|passwd-?\|shadow-?\|sysconfig/.+\)\' . conf-mode) ([cC]hange[lL]og[-.][-0-9a-z]+\' . change-log-mode) (/\.?\(?:gitconfig\|gnokiirc\|hgrc\|kde.*rc\|mime\.types\|wgetrc\)\' . conf-mode) (/\.mailmap\' . conf-unix-mode) (/\.\(?:asound\|enigma\|fetchmail\|gltron\|gtk\|hxplayer\|mairix\|mbsync\|msmtp\|net\|neverball\|nvidia-settings-\|offlineimap\|qt/.+\|realplayer\|reportbug\|rtorrent\.\|screen\|scummvm\|sversion\|sylpheed/.+\|xmp\)rc\' . conf-mode) (/\.\(?:gdbtkinit\|grip\|mpdconf\|notmuch-config\|orbital/.+txt\|rhosts\|tuxracer/options\)\' . conf-mode) (/\.?X\(?:default\|resource\|re\)s\> . conf-xdefaults-mode) (/X11.+app-defaults/\|\.ad\' . conf-xdefaults-mode) (/X11.+locale/.+/Compose\' . conf-colon-mode) (/X11.+locale/compose\.dir\' . conf-javaprop-mode) (\.~?[0-9]+\.[0-9][-.0-9]*~?\' nil t) (\.\(?:orig\|in\|[bB][aA][kK]\)\' nil t) ([/.]c\(?:on\)?f\(?:i?g\)?\(?:\.[a-zA-Z0-9._-]+\)?\' . conf-mode-maybe) (\.[1-9]\' . nroff-mode) (\.art\' . image-mode) (\.avs\' . image-mode) (\.bmp\' . image-mode) (\.cmyk\' . image-mode) (\.cmyka\' . image-mode) (\.crw\' . image-mode) (\.dcr\' . image-mode) (\.dcx\' . image-mode) (\.dng\' . image-mode) (\.dpx\' . image-mode) (\.fax\' . image-mode) (\.heic\' . image-mode) (\.hrz\' . image-mode) (\.icb\' . image-mode) (\.icc\' . image-mode) (\.icm\' . image-mode) (\.ico\' . image-mode) (\.icon\' . image-mode) (\.jbg\' . image-mode) (\.jbig\' . image-mode) (\.jng\' . image-mode) (\.jnx\' . image-mode) (\.miff\' . image-mode) (\.mng\' . image-mode) (\.mvg\' . image-mode) (\.otb\' . image-mode) (\.p7\' . image-mode) (\.pcx\' . image-mode) (\.pdb\' . image-mode) (\.pfa\' . image-mode) (\.pfb\' . image-mode) (\.picon\' . image-mode) (\.pict\' . image-mode) (\.rgb\' . image-mode) (\.rgba\' . image-mode) (\.tga\' . image-mode) (\.wbmp\' . image-mode) (\.webp\' . image-mode) (\.wmf\' . image-mode) (\.wpg\' . image-mode) (\.xcf\' . image-mode) (\.xmp\' . image-mode) (\.xwd\' . image-mode) (\.yuv\' . image-mode) (\.tgz\' . tar-mode) (\.tbz2?\' . tar-mode) (\.txz\' . tar-mode) (\.tzst\' . tar-mode) (\.drv\' . latex-mode))
+
+#+begin_src emacs-lisp
+(setq web-mode-engines-alist '(("django" . "\\.jinja\\'")))
+
+#+end_src
+
+#+RESULTS:
+: ((django . \.jinja\'))
+
+* xclip
+#+begin_src emacs-lisp
+(use-package xclip)
+(xclip-mode 1)
+
+#+end_src
+
+#+RESULTS:
+: t
+
+* ess
+#+begin_src emacs-lisp
+(use-package ess)
+
+#+end_src
