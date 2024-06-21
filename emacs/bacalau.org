@@ -1,5 +1,5 @@
 #+TITLE: bacalau.org, septembre 2023
-#+STARTUP: content
+#+STARTUP: folded
 #+OPTIONS: toc:nil num:nil
 
 * use-package
