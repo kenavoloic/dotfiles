@@ -1,0 +1,39 @@
+# history = 10000
+# multiplier = 3
+
+[colors.primary]
+background = "0x000000"
+foreground = "0x7cfc00"
+
+# [colors.primary.normal]
+# black = "0x000000"
+# blue = "0x0000ee"
+# cyan = "0x00cdcd"
+# green = "0x7cfc00"
+# magenta = "0xcd00cd"
+# red = "0xcd0000"
+# white = "0xe5e5e5"
+# yellow = "0xcdcd00"
+
+# [colors.primary.normal.bright]
+# black = "0x7f7f7f"
+# blue = "0x5c5cff"
+# cyan = "0x00ffff"
+# green = "0x00ff00"
+# magenta = "0xff00ff"
+# red = "0xff0000"
+# white = "0xffffff"
+# yellow = "0xffff00"
+
+# [colors.primary.normal.bright.font]
+# size = 18.0
+
+# [colors.primary.normal.bright.font.normal]
+# family = "Fira Code"
+# style = "Regular"
+
+[env]
+TERM = "xterm-256color"
+
+[window]
+dynamic_title = true
