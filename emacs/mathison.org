@@ -180,11 +180,6 @@ https://github.com/pascalfleury/emacs-config/
 
 ** Themes 
 #+begin_src emacs-lisp
-  ;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-  ;;(load-theme 'fonce12 t)
-#+end_src
-
-#+begin_src emacs-lisp
 (use-package gruvbox-theme
   :ensure t
   :config
@@ -196,19 +191,15 @@ https://github.com/pascalfleury/emacs-config/
   :ensure t
   :init
   (load-theme 'sanityinc-tomorrow-night))
-
 #+end_src
 
 ** all-the-icons
+https://github.com/iyefrat/all-the-icons-completion
 #+begin_src emacs-lisp
   (use-package all-the-icons
     :if (display-graphic-p))
 #+end_src
 
-https://github.com/iyefrat/all-the-icons-completion
-#+begin_src emacs-lisp
-;;(all-the-icons-completion-mode)
-#+end_src
 ** all-the-icons-dired
 https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 #+begin_src emacs-lisp
@@ -222,11 +213,6 @@ https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init
   (add-hook 'text-mode-hook 'visual-line-mode)
 #+end_src
 ** highlight
-https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init.el
-#+begin_src emacs-lisp
-  ;; (add-hook 'text-mode-hook #'hl-line-mode)
-  ;; (add-hook 'prog-mode-hook #'hl-line-mode)
-#+end_src
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Cursor-Display.html#index-highlight-current-line
 #+begin_src emacs-lisp
   (global-hl-line-mode)
@@ -419,11 +405,6 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 				 )))
 #+end_src
 
-#+RESULTS:
-| = | (:foreground red :background black) |
-| ~ | (:foreground blue)                  |
-| @ | (:foreground pink)                  |
-
 ** Fontify
 #+begin_src emacs-lisp
 (setq org-src-fontify-natively t)
@@ -474,7 +455,7 @@ https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org
                                          (clojure    . t)
                                          (dot . t)
                                          (haskell   . t)
-					 (gnuplot . t)
+  					     (gnuplot . t)
                                          (java  . t)
                                          (js     . t)
                                          (jupyter . t)
@@ -488,7 +469,7 @@ https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org
                                          (python . t)
                                          (restclient . t)
                                          (ruby . t)
-					 (sass . t)
+					     (sass . t)
                                          (scheme . t)
                                          (shell  . t)
                                          (sql    . t)
@@ -501,9 +482,6 @@ https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org
   ;; https://sachachua.com/dotemacs => Diagrams and graphics
   (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
 #+end_src
-
-#+RESULTS:
-: ((jupyter-python . python) (dot . graphviz-dot) (php . php) (C . c) (C++ . c++) (asymptote . asy) (bash . sh) (beamer . latex) (calc . fundamental) (cpp . c++) (ditaa . artist) (desktop . conf-desktop) (dot . fundamental) (elisp . emacs-lisp) (ocaml . tuareg) (screen . shell-script) (shell . sh) (sqlite . sql) (toml . conf-toml))
 
 * org-tempo
 #+begin_src emacs-lisp
@@ -565,9 +543,6 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
   (add-to-list 'org-latex-logfiles-extensions "tex"))
 
 #+end_src
-
-#+RESULTS:
-: t
 
 ** Beamer
 Allow exporting presentations to beamer.
