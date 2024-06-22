@@ -599,3 +599,11 @@ Allow exporting presentations to beamer.
 #+RESULTS:
 : t
 
+* dired
+#+begin_src emacs-lisp
+(use-package dired-rainbow
+  :ensure t
+  :config
+  (dired-rainbow-define archive "#555555" ("org_archive" "archive")))
+
+#+end_src
