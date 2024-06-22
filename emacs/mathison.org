@@ -233,16 +233,16 @@ https://www.gnu.org/software/emacs/manual/html_node/emacs/Cursor-Display.html#in
 * Moody : modeline
 https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configuration.org
 #+begin_src emacs-lisp
-  (use-package moody
-    :demand t
+  ;; (use-package moody
+  ;;   :demand t
 
-    :custom
-    (x-underline-at-descent-line t)
+  ;;   :custom
+  ;;   (x-underline-at-descent-line t)
 
-    :config
-    (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode)
-    (moody-replace-eldoc-minibuffer-message-function))
+  ;;   :config
+  ;;   (moody-replace-mode-line-buffer-identification)
+  ;;   (moody-replace-vc-mode)
+  ;;   (moody-replace-eldoc-minibuffer-message-function))
 #+end_src
 
 * which-key  
