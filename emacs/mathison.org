@@ -1,0 +1,587 @@
+#+TITLE: mathison.org, juin 2024
+#+AUTHOR: CCA
+#+STARTUP: folded
+#+OPTIONS: toc:nil num:nil
+
+* use-package
+#+begin_src emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (eval-when-compile (require 'use-package))
+#+end_src
+
+#+begin_src emacs-lisp
+(setq use-package-always-ensure t
+      use-package-always-defer  nil)
+#+end_src
+
+#+begin_src elisp
+  (use-package auto-compile
+  :demand t
+  :config (auto-compile-on-load-mode))
+  (setq load-prefer-newer t)
+#+end_src
+
+#+begin_src elisp
+  (setq byte-compile-warnings '(cl-functions))
+  (setq warning-minimum-level :emergency)
+#+end_src
+* Rainbow-delimiters
+Permet d'avoir des parenthèses colorées dès qu'il s'agit de lisp
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+  :hook ((emacs-lisp-mode lisp-mode racket-mode) . rainbow-delimiters-mode))
+#+end_src
+
+
+* Company
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package company
+    :demand t
+    ;;:bind (:map company-active-map ("<tab>" . company-complete-selection))
+    :custom
+    (company-idle-delay 0)
+    (company-minimum-prefix-length 2)
+    (company-selection-wrap-around t)
+    (company-tng-configure-default) ;; mouvement avec la touche tab
+  )
+
+  (setq company-dabbred-downcase nil)
+
+  (add-hook 'after-init-hook 'global-company-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package company-posframe
+    :config
+    (company-posframe-mode 1))
+#+end_src
+
+https://github.com/iquiw/company-restclient
+#+begin_src emacs-lisp
+(use-package company-restclient)
+(add-to-list 'company-backends 'company-restclient)
+#+end_src
+
+
+* vertico, savehist, marginalia, orderless
+#+begin_src emacs-lisp
+  (use-package vertico
+    :init
+    (vertico-mode)
+    (setq vertico-count 10)
+    (setq vertico-resize t)
+    (setq vertico-cycle t))
+
+
+  (use-package savehist
+    :init
+    (savehist-mode))
+
+  (use-package marginalia
+    :after vertico
+    :ensure t
+    :custom
+    (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+    :init
+    (marginalia-mode))
+
+  (use-package orderless
+    :init
+    (setq completion-styles '(orderless basic)
+	  completion-category-defaults nil
+	  completion-category-overrides
+	  '((file (styles partial-completion)))))
+#+end_src
+
+* Recharge configuration
+#+BEGIN_SRC emacs-lisp
+(defun rechargeConfiguration()
+(interactive)
+(load-file "~/.emacs.d/init.el"))
+#+END_SRC
+
+* Auth-source
+Choix du fichier : .netrc suivi d'un chmod 600
+
+#+begin_src emacs-lisp
+(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc"))
+
+#+end_src
+* Fontes
+#+begin_src emacs-lisp
+  (defconst fonteParDefaut "Anonymous Pro")
+  (defconst monoParDefaut "Anonymous Pro")  
+  (defconst variableParDefaut "Cardo")
+  (set-face-attribute 'default nil :family monoParDefaut :height 240)
+  (set-face-attribute 'fixed-pitch nil :family monoParDefaut :height 240)
+  (set-face-attribute 'variable-pitch nil :family variableParDefaut :height 260)
+
+#+end_src
+
+* Interface
+** GUI
+#+begin_src emacs-lisp
+  (use-package emacs
+    :ensure nil
+    :defer nil
+    :config
+    (setq frame-title-format '("" (buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+    (setq inhibit-startup-screen        t
+	  inhibit-splash-screen         t
+	  show-paren-mode               1
+	  show-paren-delay              0
+	  scroll-bar-mode               -1
+	  ;;browser-url-browse-function   'browse-url-firefox
+	  browser-url-browse-function   'browse-url-chromium
+	  tab-width                     4
+	  transient-mark-mode        t
+	  mouse-wheel-follow-mouse      t
+	  scroll-step                   1
+	  scroll-conservatively         101
+	  mouse-wheel-scroll-amount     '(1)
+	  mouse-wheel-progressive-speed nil)
+    (menu-bar-mode -99)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    ;;(display-battery-mode 1)
+    (display-time)
+    (setq display-time-24hr-format t)
+    ;;(fset 'yes-or-no-p 'y-or-n-p)
+    (setq use-short-answers t)
+    (setq history-length 1000)
+
+    )
+  ;;(setq-default frame-title-format '("%b - Emacs"))
+#+end_src
+
+** windmove
+changement de fenêtre au moyen de SHIFT + flêche
+#+begin_src emacs-lisp
+
+  (when (fboundp 'windmove-default-keybindings)
+    (windmove-default-keybindings))
+#+end_src
+
+** calendrier
+https://github.com/pascalfleury/emacs-config/
+
+#+begin_src emacs-lisp
+  ;; Lundi est le premier jour de la semaine
+  (setq calendar-week-start-day 1)
+  (setq org-gcal-local-timezone "Europe/Paris")
+#+end_src
+
+** Themes 
+#+begin_src emacs-lisp
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+  ;;(load-theme 'fonce10 t)
+  (load-theme 'fonce12 t)
+#+end_src
+
+#+RESULTS:
+: t
+
+** all-the-icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :if (display-graphic-p))
+#+end_src
+
+https://github.com/iyefrat/all-the-icons-completion
+#+begin_src emacs-lisp
+;;(all-the-icons-completion-mode)
+#+end_src
+** all-the-icons-dired
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :config
+    (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+#+end_src
+** visual-line-mode
+https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init.el
+#+begin_src emacs-lisp
+  (add-hook 'text-mode-hook 'visual-line-mode)
+#+end_src
+** highlight
+https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init.el
+#+begin_src emacs-lisp
+  ;; (add-hook 'text-mode-hook #'hl-line-mode)
+  ;; (add-hook 'prog-mode-hook #'hl-line-mode)
+#+end_src
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Cursor-Display.html#index-highlight-current-line
+#+begin_src emacs-lisp
+  (global-hl-line-mode)
+#+end_src
+
+
+* Moody : modeline
+https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configuration.org
+#+begin_src emacs-lisp
+  (use-package moody
+    :demand t
+
+    :custom
+    (x-underline-at-descent-line t)
+
+    :config
+    (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode)
+    (moody-replace-eldoc-minibuffer-message-function))
+#+end_src
+
+* which-key  
+#+begin_src emacs-lisp
+(use-package which-key
+:config (which-key-mode))
+#+end_src
+
+* know-your-http-well
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+utilisations :
+M-X http-...
+
+#+begin_src emacs-lisp
+(use-package know-your-http-well
+  :commands (http-header
+	     http-method
+	     http-relation
+	     http-status-code
+	     media-type))
+
+#+end_src
+
+
+* Outils (in/dé)crémente sous le curseur
+#+begin_src emacs-lisp
+  (defun incremente(&optional arg)
+    "Incrémenter le nombre sous le curseur"
+    (interactive "*p")
+    (let* ((bounds (bounds-of-thing-at-point 'word))
+	   (beg (car bounds))
+	   (end (cdr bounds))
+	   (num (string-to-number (buffer-substring beg end)))
+	   (incr (cond ((null arg) 1)
+		       ((listp arg) -1)
+		       (t arg)))
+	   (value (+ num incr)))
+      (delete-region beg end)
+      (insert (format "%d" value))))
+#+end_src
+#+begin_src emacs-lisp
+(defun plus()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point."))
+  (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
+(global-set-key (kbd "M-à") 'plus)
+#+end_src
+#+begin_src emacs-lisp
+(defun moins()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point."))
+  (replace-match (number-to-string (1- (string-to-number (match-string 0))))))
+(global-set-key (kbd "M-é") 'moins)
+#+end_src
+
+
+* Surligne les nombres
+#+begin_src emacs-lisp
+  (use-package highlight-numbers)
+  (add-hook 'prog-mode-hook 'highlight-numbers-mode)
+#+end_src
+
+* Recherche orthographique
+https://irfu.cea.fr/Pisp/vianney.lebouteiller/emacs.html
+#+begin_src emacs-lisp
+;;; https://irfu.cea.fr/Pisp/vianney.lebouteiller/emacs.html
+  (defun recherche-mot-dico()
+    "Recherche le mot sous le curseur dans cnrtl.fr "
+    (interactive)
+    (let (word)
+      (setq word
+	    (if (use-region-p)
+		(buffer-substring-no-properties (region-beginning) (region-end))
+	      (current-word)))
+      (setq word (replace-regexp-in-string " " "_" word))
+      (browse-url (concat "http://www.cnrtl.fr/definition/" word))
+  ))
+#+end_src
+
+#+RESULTS:
+: recherche-mot-dico
+
+* EPUB
+https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
+#+begin_src emacs-lisp
+  (use-package ox-epub
+  :after org
+  :commands (org-export-dispatch))
+#+end_src
+
+* magit
+#+begin_src emacs-lisp
+  (use-package magit
+  :bind
+  (("C-x g" . magit-status)))
+#+end_src
+
+* git-timemachine
+Permet de consulter rapidement l'historique d'un fichier
+#+begin_src emacs-lisp
+(use-package git-timemachine)
+#+end_src
+
+* org
+
+#+begin_src emacs-lisp
+  (use-package org
+    :config
+    (setq org-startup-indented t
+	  org-ellipsis " ↲"
+	  org-hide-emphasis-markers t
+	  org-startup-with-inline-images t
+	  org-image-actual-width '(450)
+	  org-hide-block-startup nil
+	  org-catch-invisible-edits 'error
+	  org-cycle-separator-lines 0
+	  org-startup-with-latex-preview nil
+	  org-export-with-smart-quotes t)) ; transforme ' en ’ au moment de l'export
+#+end_src
+
+
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package org-appear
+    :hook (org-mode . org-appear-mode))
+#+end_src
+
+** Visual-line mode
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook (lambda () (visual-line-mode 1)))
+
+#+end_src
+
+** Superstar
+#+begin_src emacs-lisp
+(use-package org-superstar
+:defer t
+:hook (org-mode . org-superstar-mode))
+#+end_src
+
+** Emphase en rouge
+#+begin_src emacs-lisp
+(setq org-emphasis-alist (quote (
+				 ("=" (:foreground "red" :background "black"))
+				 ("~" (:foreground "blue"))
+				 ("@" (:foreground "pink"))
+				 )))
+#+end_src
+
+#+RESULTS:
+| = | (:foreground red :background black) |
+| ~ | (:foreground blue)                  |
+| @ | (:foreground pink)                  |
+
+** Fontify
+#+begin_src emacs-lisp
+(setq org-src-fontify-natively t)
+#+end_src
+
+** Indentation
+
+#+begin_src emacs-lisp
+(setq org-src-preserve-indentation t)
+#+end_src
+** ob-restclient
+#+begin_src emacs-lisp
+(use-package ob-restclient
+  :after org)
+#+end_src
+
+** couleurs org-mode
+https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org-mode
+#+begin_src emacs-lisp
+;; (defun cca-org-mode-hook()
+;;   `(set-face-attribute org-level-1 nil :foreground "blue")
+;;   `(set-face-attribute org-level-2 nil :foreground "yellow"))
+
+;; (add-hook 'org-mode-hook 'cca-org-mode-hook)
+  
+#+end_src
+
+#+RESULTS:
+
+* org-babel
+** patrons src-block
+#+begin_src emacs-lisp
+    (with-eval-after-load 'org
+    (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp\n"))
+    (add-to-list 'org-structure-template-alist '("sp" . "src python :results output\n"))
+    (add-to-list 'org-structure-template-alist '("sr" . "src R :results output\n"))
+    (add-to-list 'org-structure-template-alist '("sj" . "src js :results output\n"))
+    (add-to-list 'org-structure-template-alist '("sq" . "src sql\n")))
+#+end_src
+
+** Langages
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages 'org-babel-load-languages
+                                   '(
+                                         (C . t)
+                                         (R . t)
+                                         (awk . t)
+                                         (clojure    . t)
+                                         (dot . t)
+                                         (haskell   . t)
+					 (gnuplot . t)
+                                         (java  . t)
+                                         (js     . t)
+                                         (jupyter . t)
+                                         (latex . t)
+                                         (lilypond . t)
+                                         (lisp   . t)
+                                         (perl . t)
+                                         (php . t)
+                                         (plantuml . t)
+                                         (prolog . t)
+                                         (python . t)
+                                         (restclient . t)
+                                         (ruby . t)
+					 (sass . t)
+                                         (scheme . t)
+                                         (shell  . t)
+                                         (sql    . t)
+					     (sqlite . t)
+                                         ;;(csharp . t)
+                                         ;;(ein    . t)
+                                         ;;(scala . t)
+                                         ))
+  (setq org-confirm-babel-evaluate nil)
+  ;; https://sachachua.com/dotemacs => Diagrams and graphics
+  (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+#+end_src
+
+#+RESULTS:
+: ((jupyter-python . python) (dot . graphviz-dot) (php . php) (C . c) (C++ . c++) (asymptote . asy) (bash . sh) (beamer . latex) (calc . fundamental) (cpp . c++) (ditaa . artist) (desktop . conf-desktop) (dot . fundamental) (elisp . emacs-lisp) (ocaml . tuareg) (screen . shell-script) (shell . sh) (sqlite . sql) (toml . conf-toml))
+
+* org-tempo
+#+begin_src emacs-lisp
+(use-package org-tempo
+  :demand t
+  :ensure nil
+  :config (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
+#+end_src
+* Org mode en lieu et place de =scratch=
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src elisp
+  (setq-default initial-major-mode 'org-mode
+	      initial-scratch-message "#+TITLE: Buffer Scratch\n\n")
+#+end_src
+* org-reveal
+#+begin_src emacs-lisp
+(use-package ox-reveal)
+#+end_src
+
+* org-latex
+https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
+
+** Exporting to PDF
+- I want to produce PDFs with syntax highlighting in the code. The best way to do that seems to be with the =minted= package, but that package shells out to =pygments= to do the actual work. xelatex usually disallows shell commands; this enables that.
+- Include the listings package in all of my LaTeX exports.
+- Remove the intermediate TeX file when exporting to PDF.
+
+#+begin_src emacs-lisp
+(use-package ox-latex
+  :ensure-system-package latexmk
+  :ensure nil
+  :after org
+  :commands (org-export-dispatch)
+
+  :custom
+  (org-latex-pdf-process '("latexmk -xelatex -shell-escape -quiet -f %f"))
+
+  (org-latex-src-block-backend 'listings)
+  (org-latex-listings-options
+   '(("basicstyle" "\\ttfamily")
+     ("showstringspaces" "false")
+     ("keywordstyle" "\\color{blue}\\textbf")
+     ("commentstyle" "\\color{gray}")
+     ("stringstyle" "\\color{green!70!black}")
+     ("stringstyle" "\\color{red}")
+     ("frame" "single")
+     ("numbers" "left")
+     ("numberstyle" "\\ttfamily")
+     ("columns" "fullflexible")))
+
+  (org-latex-packages-alist '(("" "listings")
+                              ("" "booktabs")
+                              ("AUTO" "polyglossia" t ("xelatex" "lualatex"))
+                              ("" "grffile")
+                              ("" "unicode-math")
+                              ("" "xcolor")))
+
+  :config
+  (add-to-list 'org-latex-logfiles-extensions "tex"))
+
+#+end_src
+
+#+RESULTS:
+: t
+
+** Beamer
+Allow exporting presentations to beamer.
+
+#+begin_src emacs-lisp
+(use-package ox-beamer
+  :ensure nil
+  :after ox-latex)
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+(use-package auctex
+  :custom
+  (TeX-parse-self t)
+
+  :config
+  (TeX-global-PDF-mode 1)
+
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (LaTeX-math-mode)
+              (setq TeX-master t))))
+
+#+end_src
+
+#+RESULTS:
+: t
+
+* Garbage collector
+https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configuration.org
+
+Trigger garbage collection when I've been idle for five seconds and memory usage is over 16 MB.
+
+#+begin_src emacs-lisp
+  (use-package gcmh
+    :demand t
+
+    :init
+    (setq gcmh-idle-delay 5
+          gcmh-high-cons-threshold (* 16 1024 1024))
+    :config
+    (gcmh-mode))
+#+end_src
+
+#+RESULTS:
+: t
+
+
