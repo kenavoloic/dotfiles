@@ -177,13 +177,24 @@ https://github.com/pascalfleury/emacs-config/
 
 ** Themes 
 #+begin_src emacs-lisp
-  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-  ;;(load-theme 'fonce10 t)
-  (load-theme 'fonce12 t)
+  ;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+  ;;(load-theme 'fonce12 t)
 #+end_src
 
-#+RESULTS:
-: t
+#+begin_src emacs-lisp
+(use-package gruvbox-theme
+  :ensure t
+  :init
+  (load-theme 'gruvbox-dark-medium t))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package color-theme-sanityinc-tomorrow
+  :ensure t
+  :config
+  (load-theme 'sanityinc-tomorrow-night))
+
+#+end_src
 
 ** all-the-icons
 #+begin_src emacs-lisp
@@ -239,6 +250,26 @@ https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configur
 (use-package which-key
 :config (which-key-mode))
 #+end_src
+
+* Garbage collector
+https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configuration.org
+
+Trigger garbage collection when I've been idle for five seconds and memory usage is over 16 MB.
+
+#+begin_src emacs-lisp
+  (use-package gcmh
+    :demand t
+
+    :init
+    (setq gcmh-idle-delay 5
+          gcmh-high-cons-threshold (* 16 1024 1024))
+    :config
+    (gcmh-mode))
+#+end_src
+
+#+RESULTS:
+: t
+
 
 * know-your-http-well
 https://github.com/jwiegley/dot-emacs/blob/master/init.org
@@ -564,24 +595,4 @@ Allow exporting presentations to beamer.
 
 #+RESULTS:
 : t
-
-* Garbage collector
-https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configuration.org
-
-Trigger garbage collection when I've been idle for five seconds and memory usage is over 16 MB.
-
-#+begin_src emacs-lisp
-  (use-package gcmh
-    :demand t
-
-    :init
-    (setq gcmh-idle-delay 5
-          gcmh-high-cons-threshold (* 16 1024 1024))
-    :config
-    (gcmh-mode))
-#+end_src
-
-#+RESULTS:
-: t
-
 
