@@ -187,14 +187,14 @@ https://github.com/pascalfleury/emacs-config/
 #+begin_src emacs-lisp
 (use-package gruvbox-theme
   :ensure t
-  :init
+  :config
   (load-theme 'gruvbox-dark-medium t))
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
-  :config
+  :init
   (load-theme 'sanityinc-tomorrow-night))
 
 #+end_src
