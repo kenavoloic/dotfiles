@@ -1,6 +1,6 @@
 #+TITLE: mathison.org, juin 2024
 #+AUTHOR: CCA
-#+STARTUP: folded
+#+STARTUP: content
 #+OPTIONS: toc:nil num:nil
 
 * use-package
@@ -169,15 +169,6 @@ changement de fenêtre au moyen de SHIFT + flêche
     (windmove-default-keybindings))
 #+end_src
 
-** calendrier
-https://github.com/pascalfleury/emacs-config/
-
-#+begin_src emacs-lisp
-  ;; Lundi est le premier jour de la semaine
-  (setq calendar-week-start-day 1)
-  (setq org-gcal-local-timezone "Europe/Paris")
-#+end_src
-
 ** Themes 
 #+begin_src emacs-lisp
 (use-package gruvbox-theme
@@ -219,7 +210,16 @@ https://www.gnu.org/software/emacs/manual/html_node/emacs/Cursor-Display.html#in
 #+end_src
 
 
-* Moody : modeline
+** calendrier
+https://github.com/pascalfleury/emacs-config/
+
+#+begin_src emacs-lisp
+  ;; Lundi est le premier jour de la semaine
+  (setq calendar-week-start-day 1)
+  (setq org-gcal-local-timezone "Europe/Paris")
+#+end_src
+
+* Moody  =désactivé=
 https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configuration.org
 #+begin_src emacs-lisp
   ;; (use-package moody
@@ -338,6 +338,113 @@ https://irfu.cea.fr/Pisp/vianney.lebouteiller/emacs.html
 #+RESULTS:
 : recherche-mot-dico
 
+* Typographie : signes doubles
+** signes doubles
+  #+BEGIN_SRC emacs-lisp
+(defun cca-exclamation()
+  (interactive)
+  (save-excursion
+    (insert " !")))
+
+(defun cca-interrogation()
+  (interactive)
+  (save-excursion
+    (insert " ?")))
+
+(defun cca-deuxpoints()
+  (interactive)
+  (save-excursion
+    (insert " :")))
+
+(defun cca-pointvirgule()
+  (interactive)
+  (save-excursion
+    (insert " ;")))
+
+
+  #+END_SRC
+
+** espaces
+    #+BEGIN_SRC emacs-lisp
+;;; insert-char remplace ucs-insert depuis emacs 24
+    (defun cca-insecable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#xa0))
+
+    (defun cca-fine-secable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2009))
+
+    (defun cca-fine-insecable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x202f))
+
+
+    (defun cca-tiret-cadratin()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2014))
+
+    (defun cca-tiret-demi-cadratin()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2013))
+  #+END_SRC
+
+** ligatures et autres
+    #+BEGIN_SRC emacs-lisp
+
+(defun cca-ae()
+  (interactive)
+  (save-excursion)
+  (insert-char '#x00e6))
+ 
+(defun cca-oe()
+  (interactive)
+  (save-excursion)
+  (insert-char '#x0153))
+
+(defun cca-left()
+  (interactive)
+  (save-excursion)
+(insert-char '#x201c))
+
+(defun cca-right()
+  (interactive)
+  (save-excursion)
+(insert-char '#x201d))
+
+(defun cca-left-single()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2018))
+
+(defun cca-right-single()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2019))
+
+(defun cca-ampersand()
+  (interactive)
+  (save-excursion)
+(insert-char '#x026))
+
+(defun cca-apostrophe()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2019))
+
+(defun cca-suspension()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2026))
+
+  #+END_SRC
+
+
 * EPUB
 https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
 #+begin_src emacs-lisp
@@ -421,7 +528,7 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
   :after org)
 #+end_src
 
-** couleurs org-mode
+** couleurs org-mode =désactivé=
 https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org-mode
 #+begin_src emacs-lisp
 ;; (defun cca-org-mode-hook()
@@ -582,3 +689,22 @@ Allow exporting presentations to beamer.
   (dired-rainbow-define archive "#555555" ("org_archive" "archive")))
 
 #+end_src
+
+* Flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+  :init
+  (global-flycheck-mode t))
+
+  (use-package elisp-lint)
+#+end_src
+
+* Flymake
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+#+begin_src emacs-lisp
+(use-package flymake
+  :defer t
+  :custom-face
+  (flymake-note ((t nil))))
+#+end_src
+
