@@ -453,6 +453,107 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
   :commands (org-export-dispatch))
 #+end_src
 
+
+* Dired
+
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil ; parce qu'il est désormais installé par défaut donc pas besoin de le télécharger
+    :diminish dired-omit-mode
+    :hook (dired-mode . dired-hide-details-mode) ;; par défaut masque les fichiers cachés
+    :custom
+    (dired-listing-switches "-agho --group-directories-first")
+    (dired-dwim-target t)
+  )
+
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package dired-git
+  :ensure t
+  :hook (dired-mode . dired-git-mode))
+
+#+end_src
+
+
+#+begin_src emacs-lisp
+(use-package dired-gitignore
+  :ensure t
+  :bind
+  (:map dired-mode-map ("C-." . dired-gitignore-mode)))
+
+#+end_src
+
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :hook (dired-mode . all-the-icons-dired-mode)
+    )
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package dired-subtree
+  :ensure t
+  :after dired
+  :config
+  (bind-key "<tab>" #'dired-subtree-toggle dired-mode-map)
+  (bind-key "<backtab>" #'dired-subtree-cycle dired-mode-map)
+  (bind-key "i" #'dired-subtree-insert dired-mode-map)
+  (bind-key ";" #'dired-subtree-remove dired-mode-map)  )
+
+#+end_src
+
+
+#+begin_src emacs-lisp
+(use-package dired-collapse
+  :ensure t)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package dired-filter
+  :ensure t)
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+(use-package dired-rainbow
+  :ensure t)
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+;; (use-package dired-hacked-utils
+;;   :ensure t)
+#+end_src
+
+#+begin_src emacs-lisp
+;; (use-package dired-sidebar
+;;   :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
+;;   :ensure nil
+;;   :commands (dired-sidebar-toggle-sidebar))
+#+end_src
+
+#+RESULTS:
+: dired-sidebar-toggle-sidebar
+
+https://github.com/clemera/dired-git-info/
+#+begin_src emacs-lisp
+;; (use-package dired-git-info-mode
+;;   :config
+;;   (add-hook 'dired-after-readin-hook 'dired-git-info-auto-enable)
+;;   )
+#+end_src
+
+#+begin_src emacs-lisp
+
+;; (with-eval-after-load 'dired
+;;   (define-key dired-mode-map ")" 'dired-git-info-mode))
+
+;; (setq dgi-auto-hide-details-p nil)
+#+end_src
+
 * magit
 #+begin_src emacs-lisp
   (use-package magit
