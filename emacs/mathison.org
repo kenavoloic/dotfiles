@@ -702,8 +702,13 @@ https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org
 * Org mode en lieu et place de =scratch=
 https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 #+begin_src elisp
-  (setq-default initial-major-mode 'org-mode
-	      initial-scratch-message "#+TITLE: Buffer Scratch\n\n")
+  ;; (setq-default initial-major-mode 'org-mode
+  ;; 	      initial-scratch-message "#+TITLE: Buffer Scratch\n\n")
+#+end_src
+
+#+begin_src emacs-lisp
+(setq initial-major-mode 'org-mode initial-scratch-message "#+TITLE: Buffer Scratch\n\n" initial-buffer-choice t)
+
 #+end_src
 * org-reveal
 #+begin_src emacs-lisp
