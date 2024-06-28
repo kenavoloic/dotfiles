@@ -519,7 +519,13 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
   :ensure t)
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package diredful
+  :config (setq diredful-mode 1))
+
+#+end_src
 #+RESULTS:
+: t
 
 #+begin_src emacs-lisp
 ;; (use-package dired-hacked-utils
