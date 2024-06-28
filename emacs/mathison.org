@@ -472,7 +472,6 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
 (use-package dired-git
   :ensure t
   :hook (dired-mode . dired-git-mode))
-
 #+end_src
 
 
@@ -481,7 +480,6 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
   :ensure t
   :bind
   (:map dired-mode-map ("C-." . dired-gitignore-mode)))
-
 #+end_src
 
 https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
@@ -505,13 +503,13 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 
 
 #+begin_src emacs-lisp
-(use-package dired-collapse
-  :ensure t)
+;; (use-package dired-collapse
+;;   :ensure t)
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package dired-filter
-  :ensure t)
+;; (use-package dired-filter
+;;   :ensure t)
 #+end_src
 
 #+RESULTS:
@@ -534,9 +532,6 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 ;;   :ensure nil
 ;;   :commands (dired-sidebar-toggle-sidebar))
 #+end_src
-
-#+RESULTS:
-: dired-sidebar-toggle-sidebar
 
 https://github.com/clemera/dired-git-info/
 #+begin_src emacs-lisp
