@@ -684,7 +684,7 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 #+end_src
 
 #+begin_src emacs-lisp
-(setq initial-major-mode 'org-mode initial-scratch-message "#+TITLE: Buffer Scratch\n\n" initial-buffer-choice t)
+(setq initial-major-mode 'org-mode initial-scratch-message "#+TITLE: Scratch\n\n" initial-buffer-choice t)
 
 #+end_src
 * org-reveal
