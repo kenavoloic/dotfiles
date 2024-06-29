@@ -672,7 +672,7 @@ https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org
                                          (lilypond . t)
                                          (lisp   . t)
                                          (perl . t)
-                                         (php . t)
+                                         ;;(php . t)
                                          (plantuml . t)
                                          (prolog . t)
                                          (python . t)
