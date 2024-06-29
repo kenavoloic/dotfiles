@@ -667,7 +667,7 @@ https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org
   					     (gnuplot . t)
                                          (java  . t)
                                          (js     . t)
-                                         (jupyter . t)
+                                         ;;(jupyter . t)
                                          (latex . t)
                                          (lilypond . t)
                                          (lisp   . t)
