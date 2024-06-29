@@ -28,6 +28,40 @@
   (setq byte-compile-warnings '(cl-functions))
   (setq warning-minimum-level :emergency)
 #+end_src
+* Garbage collector
+https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configuration.org
+
+Trigger garbage collection when I've been idle for five seconds and memory usage is over 16 MB.
+
+#+begin_src emacs-lisp
+  (use-package gcmh
+    :demand t
+
+    :init
+    (setq gcmh-idle-delay 5
+          gcmh-high-cons-threshold (* 16 1024 1024))
+    :config
+    (gcmh-mode))
+#+end_src
+
+#+RESULTS:
+: t
+
+
+* Recharge configuration
+#+BEGIN_SRC emacs-lisp
+(defun rechargeConfiguration()
+(interactive)
+(load-file "~/.emacs.d/init.el"))
+#+END_SRC
+
+* Auth-source
+Choix du fichier : .netrc suivi d'un chmod 600
+
+#+begin_src emacs-lisp
+(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc"))
+
+#+end_src
 * Rainbow-delimiters
 Permet d'avoir des parenthèses colorées dès qu'il s'agit de lisp
 #+begin_src emacs-lisp
@@ -97,20 +131,6 @@ https://github.com/iquiw/company-restclient
 	  '((file (styles partial-completion)))))
 #+end_src
 
-* Recharge configuration
-#+BEGIN_SRC emacs-lisp
-(defun rechargeConfiguration()
-(interactive)
-(load-file "~/.emacs.d/init.el"))
-#+END_SRC
-
-* Auth-source
-Choix du fichier : .netrc suivi d'un chmod 600
-
-#+begin_src emacs-lisp
-(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc"))
-
-#+end_src
 * Fontes
 #+begin_src emacs-lisp
   (defconst fonteParDefaut "Anonymous Pro")
@@ -239,26 +259,6 @@ https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configur
 (use-package which-key
 :config (which-key-mode))
 #+end_src
-
-* Garbage collector
-https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configuration.org
-
-Trigger garbage collection when I've been idle for five seconds and memory usage is over 16 MB.
-
-#+begin_src emacs-lisp
-  (use-package gcmh
-    :demand t
-
-    :init
-    (setq gcmh-idle-delay 5
-          gcmh-high-cons-threshold (* 16 1024 1024))
-    :config
-    (gcmh-mode))
-#+end_src
-
-#+RESULTS:
-: t
-
 
 * know-your-http-well
 https://github.com/jwiegley/dot-emacs/blob/master/init.org
