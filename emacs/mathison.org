@@ -677,12 +677,6 @@ https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org
   :config (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
 * Org mode en lieu et place de =scratch=
-https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
-#+begin_src elisp
-  ;; (setq-default initial-major-mode 'org-mode
-  ;; 	      initial-scratch-message "#+TITLE: Buffer Scratch\n\n")
-#+end_src
-
 #+begin_src emacs-lisp
 (setq initial-major-mode 'org-mode initial-scratch-message "#+TITLE: Scratch\n\n" initial-buffer-choice t)
 
@@ -710,3 +704,21 @@ https://github.com/jwiegley/dot-emacs/blob/master/init.org
   (flymake-note ((t nil))))
 #+end_src
 
+* Capture d'écran
+#+begin_src emacs-lisp
+(defun screenshot-svg ()
+  "Save a screenshot of the current frame as an SVG image.
+  Saves to a temp file and puts the filename in the kill ring."
+  (interactive)
+  (let* ((filename
+          (expand-file-name
+           (format-time-string "%Y-%m-%d-%H-%M-%S.svg")
+           "~/"))
+         (data (x-export-frames nil 'svg)))
+    (with-temp-file filename
+      (insert data))
+    (kill-new filename)
+    (message filename)))
+
+
+#+end_src
