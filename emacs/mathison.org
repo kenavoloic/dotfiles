@@ -171,17 +171,17 @@ changement de fenêtre au moyen de SHIFT + flêche
 
 ** Themes 
 #+begin_src emacs-lisp
-(use-package gruvbox-theme
-  :ensure t
-  :config
-  (load-theme 'gruvbox-dark-medium t))
+;; (use-package gruvbox-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'gruvbox-dark-medium t))
 #+end_src
 
 #+begin_src emacs-lisp
-;; (use-package color-theme-sanityinc-tomorrow
-;;   :ensure t
-;;   :init
-;;   (load-theme 'sanityinc-tomorrow-night))
+(use-package color-theme-sanityinc-tomorrow
+  :ensure t
+  :config
+  (load-theme 'sanityinc-tomorrow-night t))
 #+end_src
 
 ** all-the-icons
