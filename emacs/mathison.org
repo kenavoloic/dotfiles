@@ -674,7 +674,7 @@ https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org
                                          (perl . t)
                                          ;;(php . t)
                                          (plantuml . t)
-                                         (prolog . t)
+                                         ;;(prolog . t)
                                          (python . t)
                                          (restclient . t)
                                          (ruby . t)
