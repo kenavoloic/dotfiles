@@ -62,6 +62,11 @@ Choix du fichier : .netrc suivi d'un chmod 600
 (setq auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc"))
 
 #+end_src
+* Winner-mode
+https://www.emacswiki.org/emacs/WinnerMode
+#+begin_src emacs-lisp
+(winner-mode 1)
+#+end_src
 * Rainbow-delimiters
 Permet d'avoir des parenthèses colorées dès qu'il s'agit de lisp
 #+begin_src emacs-lisp
@@ -449,11 +454,9 @@ https://irfu.cea.fr/Pisp/vianney.lebouteiller/emacs.html
 https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
 #+begin_src emacs-lisp
   (use-package ox-epub
-  :after org
-  :commands (org-export-dispatch))
+    :after org
+    :commands (org-export-dispatch))
 #+end_src
-
-
 * Dired
 
 #+begin_src emacs-lisp
@@ -465,6 +468,11 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
     (dired-listing-switches "-agho --group-directories-first")
     (dired-dwim-target t)
   )
+
+#+end_src
+
+#+begin_src emacs-lisp
+(setq dired-kill-when-opening-new-dired-buffer t)
 
 #+end_src
 
@@ -582,7 +590,8 @@ Permet de consulter rapidement l'historique d'un fichier
 	  org-catch-invisible-edits 'error
 	  org-cycle-separator-lines 0
 	  org-startup-with-latex-preview nil
-	  org-export-with-smart-quotes t)) ; transforme ' en ’ au moment de l'export
+	  org-export-with-smart-quotes t) ; transforme ' en ’ au moment de l'export
+    :custom (initial-major-mode 'org-mode))
 #+end_src
 
 
@@ -657,12 +666,15 @@ https://emacs.stackexchange.com/questions/26781/customize-colors-of-level-in-org
 ** Langages
 #+begin_src emacs-lisp
   (org-babel-do-load-languages 'org-babel-load-languages
-                                   '(
+                                   '((ditaa . t)
                                      (awk . t)
                                      (dot . t)
-   				     (gnuplot . t)
+				     (emacs-lisp . t)
+   				         (gnuplot . t)
                                      (js     . t)
                                      (lilypond . t)
+				     (shell . t)
+				     (python . t)
                                      ))
   (setq org-confirm-babel-evaluate nil)
   ;; https://sachachua.com/dotemacs => Diagrams and graphics
