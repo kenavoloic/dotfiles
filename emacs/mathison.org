@@ -485,6 +485,13 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
 #+end_src
 
 #+begin_src emacs-lisp
+(use-package dired-hide-dotfiles
+  :ensure t
+  :bind (:map dired-mode-map ("." . dired-hide-dotfiles-mode)))
+
+#+end_src
+
+#+begin_src emacs-lisp
 (setq dired-kill-when-opening-new-dired-buffer t)
 
 #+end_src
@@ -503,11 +510,19 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
   (:map dired-mode-map ("C-." . dired-gitignore-mode)))
 #+end_src
 
+
+#+begin_src emacs-lisp
+(use-package dired-git-info
+  :ensure t
+  :bind
+  (:map dired-mode-map (")" . dired-git-info-mode)))
+
+#+end_src
 https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 #+begin_src emacs-lisp
-  (use-package all-the-icons-dired
-    :hook (dired-mode . all-the-icons-dired-mode)
-    )
+  ;; (use-package all-the-icons-dired
+  ;;   :hook (dired-mode . all-the-icons-dired-mode)
+  ;;   )
 #+end_src
 
 #+begin_src emacs-lisp
