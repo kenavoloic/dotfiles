@@ -186,13 +186,16 @@ https://github.com/iquiw/company-restclient
   ;;(setq-default frame-title-format '("%b - Emacs"))
 #+end_src
 
-
 ** Uppercase-region, lowercase-region
-
+https://github.com/pascalfleury/emacs-config/blob/master/emacs_setup.org
 #+begin_src emacs-lisp
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)  ;; C-x C-u
+(put 'downcase-region 'disabled nil)  ;; C-x C-l (lowercase L)
 
+;; C-x n <key>. Widen with C-x n w
+(put 'narrow-to-region 'disabled nil)  ; C-x n n
+(put 'narrow-to-defun  'disabled nil)
+(put 'narrow-to-page   'disabled nil)
 #+end_src
 ** windmove
 changement de fenêtre au moyen de SHIFT + flêche
@@ -228,8 +231,10 @@ https://github.com/iyefrat/all-the-icons-completion
 https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 #+begin_src emacs-lisp
   (use-package all-the-icons-dired
-    :config
-    (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+    ;;:config (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+    :ensure t
+    :hook (dired-mode . all-the-icons-dired-mode)
+    :config (setq all-the-icons-dired-monochrome nil))
 #+end_src
 ** visual-line-mode
 https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init.el
