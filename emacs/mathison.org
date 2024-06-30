@@ -186,6 +186,14 @@ https://github.com/iquiw/company-restclient
   ;;(setq-default frame-title-format '("%b - Emacs"))
 #+end_src
 
+
+** Uppercase-region, lowercase-region
+
+#+begin_src emacs-lisp
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+#+end_src
 ** windmove
 changement de fenêtre au moyen de SHIFT + flêche
 #+begin_src emacs-lisp
