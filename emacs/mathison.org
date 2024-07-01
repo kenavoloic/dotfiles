@@ -463,12 +463,16 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
     :commands (org-export-dispatch))
 #+end_src
 
+https://github.com/clemera/nov.el
+https://depp.brause.cc/nov.el/
 #+begin_src emacs-lisp
 (use-package nov)
 #+end_src
 
+Désactivé pour pouvoir également utiliser ox-epub.
+Ainsi choix possible des deux modes : ox-epub / nov
 #+begin_src emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+;;(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 
 #+end_src
 * Dired
@@ -795,5 +799,33 @@ https://github.com/jwiegley/dot-emacs/blob/master/init.org
 (use-package py-autopep8
   :after python-mode
   :hook (elpy-mode-hook . py-autopep8-enable-on-save))
+
+#+end_src
+
+* Docker
+https://github.com/jwiegley/dot-emacs/blob/master/init.org
+
+#+begin_src emacs-lisp
+(use-package docker
+  ;;:bind ("C-c d" . docker)
+  :diminish
+  :init
+  (use-package docker-image :commands docker-images)
+  (use-package docker-volume :commands docker-volumes)
+  (use-package docker-network :commands docker-containers)
+  (use-package docker-compose :commands docker-compose)
+  (use-package docker-container
+    :commands docker-containers
+    :custom (docker-containers-show-all nil)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package docker-compose-mode
+  :mode "docker-compose.*\.yml\\'")
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package dockerfile-mode
+  :mode "Dockerfile[a-zA-Z.-]*\\'")
 
 #+end_src
