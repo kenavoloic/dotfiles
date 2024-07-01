@@ -39,7 +39,7 @@ Trigger garbage collection when I've been idle for five seconds and memory usage
 
     :init
     (setq gcmh-idle-delay 5
-          gcmh-high-cons-threshold (* 16 1024 1024))
+          gcmh-high-cons-threshold (* 16 1024 1024)) ; 16 MB
     :config
     (gcmh-mode))
 #+end_src
@@ -227,15 +227,6 @@ https://github.com/iyefrat/all-the-icons-completion
     :if (display-graphic-p))
 #+end_src
 
-** all-the-icons-dired
-https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
-#+begin_src emacs-lisp
-  (use-package all-the-icons-dired
-    ;;:config (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
-    :ensure t
-    :hook (dired-mode . all-the-icons-dired-mode)
-    :config (setq all-the-icons-dired-monochrome nil))
-#+end_src
 ** visual-line-mode
 https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init.el
 #+begin_src emacs-lisp
@@ -332,8 +323,9 @@ M-X http-...
 
 * Surligne les nombres
 #+begin_src emacs-lisp
-  (use-package highlight-numbers)
-  (add-hook 'prog-mode-hook 'highlight-numbers-mode)
+  (use-package highlight-numbers
+    :ensure t
+    :config  (add-hook 'prog-mode-hook 'highlight-numbers-mode))
 #+end_src
 
 * Recherche orthographique
@@ -470,6 +462,15 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
     :after org
     :commands (org-export-dispatch))
 #+end_src
+
+#+begin_src emacs-lisp
+(use-package nov)
+#+end_src
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+
+#+end_src
 * Dired
 
 #+begin_src emacs-lisp
@@ -482,6 +483,20 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
     (dired-dwim-target t)
   )
 
+#+end_src
+
+
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    ;;:config (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+    :ensure t
+    :hook (dired-mode . all-the-icons-dired-mode)
+    :config (setq all-the-icons-dired-monochrome nil))
+#+end_src
+
+#+begin_src emacs-lisp
+(setq dired-omit-files "^\\.?#\\|^\\.[^.].*")
 #+end_src
 
 #+begin_src emacs-lisp
