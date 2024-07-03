@@ -143,6 +143,40 @@ https://github.com/iquiw/company-restclient
 	  '((file (styles partial-completion)))))
 #+end_src
 
+* Ivy
+https://www.juniordeveloperdiaries.com/emacs-intro/
+
+#+begin_src emacs-lisp
+(use-package ivy
+  :init (ivy-mode 1)
+  (setq ivy-height 15
+	ivy-use-virtual-buffers t
+	ivy-use-selectable-prompt t))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package counsel
+  :after ivy
+  :init (counsel-mode 1)
+  :bind (:map ivy-minibuffer-map))
+
+#+end_src
+** highlight
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Cursor-Display.html#index-highlight-current-line
+#+begin_src emacs-lisp
+  (global-hl-line-mode)
+#+end_src
+
+
+** calendrier
+https://github.com/pascalfleury/emacs-config/
+
+#+begin_src emacs-lisp
+  ;; Lundi est le premier jour de la semaine
+  (setq calendar-week-start-day 1)
+  (setq org-gcal-local-timezone "Europe/Paris")
+#+end_src
+
 * Fontes
 #+begin_src emacs-lisp
   (defconst fonteParDefaut "Anonymous Pro")
@@ -243,40 +277,6 @@ https://github.com/iyefrat/all-the-icons-completion
 https://github.com/NapoleonWilsOn/fedora-dotfiles/blob/master/.config/emacs/init.el
 #+begin_src emacs-lisp
   (add-hook 'text-mode-hook 'visual-line-mode)
-#+end_src
-** highlight
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Cursor-Display.html#index-highlight-current-line
-#+begin_src emacs-lisp
-  (global-hl-line-mode)
-#+end_src
-
-
-** calendrier
-https://github.com/pascalfleury/emacs-config/
-
-#+begin_src emacs-lisp
-  ;; Lundi est le premier jour de la semaine
-  (setq calendar-week-start-day 1)
-  (setq org-gcal-local-timezone "Europe/Paris")
-#+end_src
-
-** Ivy
-https://www.juniordeveloperdiaries.com/emacs-intro/
-
-#+begin_src emacs-lisp
-(use-package ivy
-  :init (ivy-mode 1)
-  (setq ivy-height 15
-	ivy-use-virtual-buffers t
-	ivy-use-selectable-prompt t))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package counsel
-  :after ivy
-  :init (counsel-mode 1)
-  :bind (:map ivy-minibuffer-map))
-
 #+end_src
 * Moody  =désactivé=
 https://raw.githubusercontent.com/hrs/dotfiles/main/emacs/.config/emacs/configuration.org
@@ -893,4 +893,17 @@ https://github.com/jwiegley/dot-emacs/blob/master/init.org
 (use-package dockerfile-mode
   :mode "Dockerfile[a-zA-Z.-]*\\'")
 
+#+end_src
+
+* WorldClock
+#+begin_src emacs-lisp
+(setq world-clock-list
+      '(("Australia/Melbourne" "Melbourne")
+	("America/Los_Angeles" "Seattle")
+        ("America/New_York" "New York")
+        ("Europe/London" "London")
+        ("Europe/Paris" "Paris")
+        ("Europe/Sofia" "Sofia")
+        ("Asia/Calcutta" "Bangalore")
+        ("Asia/Tokyo" "Tokyo")))
 #+end_src
