@@ -907,3 +907,33 @@ https://github.com/jwiegley/dot-emacs/blob/master/init.org
         ("Asia/Calcutta" "Bangalore")
         ("Asia/Tokyo" "Tokyo")))
 #+end_src
+
+* eglot
+#+begin_src emacs-lisp
+(use-package eglot
+  :custom
+  (fset #'jsonrpc--log-event #'ignore)
+  (eglot-events-buffer-size 0)
+  (eglot-sync-connect nil)
+  (eglot-connect-timeout nil)
+  (eglot-autoshutdown t)
+  (eglot-send-changes-idle-time 3)
+  (flymake-no-changes-timeout 5)
+  (eldoc-echo-area-use-multiline-p nil)
+  (setq eglot-ignored-server-capabilities '( :documentHighlightProvider))
+  )
+
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package eglot-booster
+  :after eglot
+  :config (eglot-booster-mode)
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+(setq python-shell-interpreter "python3")
+(add-to-list 'eglot-server-programs '((python-mode python-ts-mode) . ("pyright-langserver" "--stdio")))
+
+#+end_src
