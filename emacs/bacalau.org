@@ -1603,3 +1603,17 @@ https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config
 
 #+RESULTS:
 : t
+* smart-shift
+https://github.com/hbin/smart-shift
+#+begin_src emacs-lisp
+(use-package smart-shift)
+#+end_src
+
+#+begin_src emacs-lisp
+;; binds C-C <arrows>
+(when (require 'smart-shift nil 'noerror)
+  (global-smart-shift-mode 1))
+#+end_src
+
+#+RESULTS:
+: t
