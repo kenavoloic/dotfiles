@@ -5,13 +5,13 @@ syntax enable
 filetype on
 filetype plugin on
 filetype indent on
-" colorscheme darkblue " slate  peachpuff slate
+colorscheme darkblue " slate  peachpuff slate
 " colorscheme koehler
-colorscheme peachpuff
+"colorscheme peachpuff
 set t_Co=256
 set mouse=a "active la souris dans le terminal
-"set number "affiche le numéro de ligne
-set nonumber "pas de numéro de ligne au démarrage.
+set number "affiche le numéro de ligne
+"set nonumber "pas de numéro de ligne au démarrage.
 nnoremap ù : set nonumber!<cr>
 set ruler " position du curseur toujours visible
 "set cursorline " matérialise la position du curseur
@@ -34,6 +34,8 @@ set hidden
 "Ignore les réglages de vim inclus dans les fichiers sources
 set nomodeline 
 
+
+
 """ Espaces, tabulations
 "https://github.com/joshfriend/dotvim/blob/master/.vimrc
 set autoindent "Active l'indentation automatique
@@ -47,7 +49,7 @@ set expandtab
 "highlight ColorColumn ctermbg=235 guibg=#2c2d27
 "let &colorcolumn=join(range(81,999), ",")
 " highlight ColorColumn ctermbg=magenta
-" call matchadd('ColorColumn', '\%81v', 100)
+" call matchadd('ColorColumn', '\%81v', 200)
 " Fixe la hauteur de la barre de commande
 set cmdheight=1
 """ Déplacement du curseur 
@@ -63,7 +65,6 @@ nmap <leader>q :q<cr>
 "nnoremap ^ <nop> " touche inactivée
 
 " Buffers
-set hidden
 " é <=> buffer précédant = :bp
 " à <=> buffer suivant = :bn
 " ç <=> suppression buffer = :bd
@@ -83,7 +84,7 @@ set path+=**
 " wildmenu
 set wildmenu
 " Type de fichiers à ignorer en cas d'autocomplétion
-set wildignore=*.jpg,*.png,*.gif,*.pdf
+set wildignore=*.jpg,*.png,*.gif,*.pdf,*.*~
 
 """Backup et autres.
 set backup                        " enable backups
@@ -110,6 +111,14 @@ set foldlevelstart=10 " à 0 tous les folds sont refermés, =10 :valeur médiane
 set foldnestmax=10 " 10 nested fold max
 "nnoremap <space> za " space open/closes folds
 
+" netrw = explorateur de fichiers 
+let g:netrw_banner=0 " supprime le bandeau initial
+let g:netrw_browse_split=4 "open in the prior window
+let g:netrw_altv=1 " open splits to the right
+let g:netrw_liststyle=3 " tree view
+let g:netrw_list_hide=netrw_gitignore#Hide()
+let g:netrw_list_hide.='\(^\|\s\s\)\zs.*\.\~$' " cacher les fichiers de type *.*~ 
+
 """Airline  
 let g:airline_theme='badwolf'
 "let g:airline_theme='dark'
@@ -129,7 +138,7 @@ let g:airline#extensions#tabline#formatter='unique_tail'
 let g:airline_left_alt_sep = ''
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
-let g:airlie_righ_alt_sep = ''
+let g:airline_righ_alt_sep = ''
 
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
@@ -141,4 +150,3 @@ endif
 
 """ Lilypond
 set runtimepath+=/usr/share/lilypond/2.18.2/vim/
-
