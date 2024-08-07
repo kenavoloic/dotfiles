@@ -1,10 +1,12 @@
 "-------------------------------------------------
 set nocompatible
 "-------------------------------------------------
-syntax enable
-filetype on
-filetype plugin on
-filetype indent on
+"syntax enable
+syntax on
+filetype plugin indent on
+" filetype plugin on
+" filetype indent on
+set backspace=indent,eol,start
 colorscheme darkblue " slate  peachpuff slate
 " colorscheme koehler
 "colorscheme peachpuff
@@ -34,15 +36,14 @@ set hidden
 "Ignore les réglages de vim inclus dans les fichiers sources
 set nomodeline 
 
-
-
 """ Espaces, tabulations
 "https://github.com/joshfriend/dotvim/blob/master/.vimrc
 set autoindent "Active l'indentation automatique
+set smartindent
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
-set expandtab
+set expandtab=4
 " set textwidth=80
 " 80 char ruler
 " set colorcolumn=80
@@ -114,7 +115,7 @@ set foldnestmax=10 " 10 nested fold max
 " netrw = explorateur de fichiers 
 let g:netrw_banner=0 " supprime le bandeau initial
 let g:netrw_browse_split=4 "open in the prior window
-let g:netrw_altv=1 " open splits to the right
+let g:netrw_altv=0 " open splits to the right
 let g:netrw_liststyle=3 " tree view
 let g:netrw_list_hide=netrw_gitignore#Hide()
 let g:netrw_list_hide.='\(^\|\s\s\)\zs.*\.\~$' " cacher les fichiers de type *.*~ 

@@ -1,0 +1,28 @@
+* Lsp 
+
+
+#+begin_example
+mkdir -p ~/.vim/pack/vendor/start
+#+end_example
+
+https://github.com/prabirshrestha/vim-lsp
+
+#+begin_example
+cd ~/.vim/pack/vendor/start/
+git clone https://github.com/prabirshrestha/vim-lsp.git
+#+end_example
+
+
+https://github.com/mattn/vim-lsp-settings
+
+#+begin_example
+cd ~/.vim/pack/vendor/start/
+git clone https://github.com/mattn/vim-lsp-settings.git
+#+end_example
+
+Pour une prise en charge de python, php ou typescript, ouvrir un fichier py, php ou ts puis 
+#+begin_example
+:LspInstallServer
+#+end_example
+
+* Modeline
