@@ -62,6 +62,13 @@ https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
 #+RESULTS:
 : rechargeConfiguration
 
+#+begin_src emacs-lisp
+(use-package restart-emacs
+  :ensure t)
+#+end_src
+
+#+RESULTS:
+
 * Texte, typographie
 ** Fontes
 #+begin_src emacs-lisp
@@ -347,7 +354,7 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 #+begin_src emacs-lisp
 (use-package orderless
   :init
-  (setq completion-styles '(orderless basic)
+  (setq completion-styles '(orderless) ;;'(orderless basic)
 	completion-category-defaults nil
 	completion-category-overrides 
 	'((file (styles partial-completion)))))
@@ -564,7 +571,9 @@ changement de fenêtre au moyen de SHIFT + flêche
 	   tool-bar-mode -1
 	   scroll-bar-mode -1
 	   use-short-answers t
-	   history-length 1000)
+	   history-length 1000
+	   trash-directory "~/.local/share/Trash/files"
+	   delete-by-moving-to-trash t)
     )
 
 #+end_src
@@ -924,6 +933,7 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 		  ("q" . "quote")
 		  ("v" . "verse")
 		  ("se" . "src emacs-lisp")
+		  ("st" . "src typescript")		  
 		  ("sp" . "src python :results output\n")
 		  ("sr" . "src R :results output\n")
 		  ("sj" . "src js :results output\n")
@@ -1564,20 +1574,20 @@ https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config
    lsp-ui-doc-include-signature t
    lsp-ui-doc-position 'bottom
    lsp-ui-doc-show-with-cursor nil
-   lsp-ui-doc-show-with-mouse nil
+   lsp-ui-doc-show-with-mouse t
    lsp-ui-doc-use-childframe nil
    lsp-ui-flycheck-enable t
    lsp-ui-flycheck-list-position 'right
    lsp-ui-flycheck-live-reporting t
    lsp-ui-imenu-enable nil
-   lsp-ui-peek-enable nil
+   lsp-ui-peek-enable t
    lsp-ui-peek-list-width 60
    lsp-ui-peek-peek-height 25
    lsp-ui-sideline-delay 3
    lsp-ui-sideline-enable nil
    lsp-ui-sideline-ignore-duplicate t
    lsp-ui-sideline-show-code-actions nil
-   lsp-ui-sideline-show-hover t)
+   lsp-ui-sideline-show-hover nil)
   :bind (:map lsp-ui-mode-map
 	      ("C-c i" . lsp-ui-imenu)))
 
@@ -1604,3 +1614,138 @@ Ajout également de vimls/vils pour lsp
 #+begin_src emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.vim\\(rc\\)?\\'" . vimrc-mode))
 #+end_src
+
+* toml
+#+begin_src emacs-lisp
+(use-package toml-mode
+  :ensure t)
+#+end_src
+
+#+RESULTS:
+
+* webmode
+#+begin_src emacs-lisp
+(use-package web-mode
+  :ensure t
+  :mode (".html" ".css" ".scss" ".jinja" ".svelte")
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-style-padding 1)
+  (web-mode-script-padding 1)
+  (web-mode-block-padding 0)
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-enable-auto-pairing t)
+  (web-mode-enable-css-colorization t))
+
+#+end_src
+
+* js2
+#+begin_src emacs-lisp
+(use-package js2-mode
+  :ensure t
+  :config
+  ;; (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2))))
+#+end_src
+
+
+* json
+
+#+begin_src emacs-lisp
+(use-package json-mode
+  :ensure t)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package json-reformat
+  :ensure t
+  :config
+  (setq json-reformat:indent-width 2))
+#+end_src
+
+* kurecolor
+
+A collection of tools for working with color in Emacs.
+
+https://github.com/emacsfodder/kurecolor
+
+#+begin_src emacs-lisp
+(use-package kurecolor
+  :ensure t)
+#+end_src
+
+
+#+begin_example
+(kurecolor-hex-to-cssrgb "#347291")
+ ⇒ "rgb(52, 114, 145)"
+(kurecolor-hex-to-cssrgb "#000000")
+ ⇒ "rgb(0, 0, 0)"
+(kurecolor-hex-to-cssrgb "#888888")
+ ⇒ "rgb(136, 136, 136)"
+#+end_example
+
+#+begin_example
+(kurecolor-hex-to-rgb "#347291")
+ ⇒ '(0.2039 0.4471 0.5686)
+(kurecolor-hex-to-rgb "#72FF91")
+ ⇒ '(0.4471 1.0 0.5686)
+(kurecolor-hex-to-rgb "#720091")
+ ⇒ '(0.4471 0.0 0.5686)
+#+end_example
+
+
+#+begin_example
+(kurecolor-hex-to-rgba "#34729100")
+ ⇒ '(0.2039 0.4471 0.5686 0.0)
+(kurecolor-hex-to-rgba "#FFFFFFFF")
+ ⇒ '(1.0 1.0 1.0 1.0)
+(kurecolor-hex-to-rgba "#72009172")
+ ⇒ '(0.44715 0.0 0.5686 0.4471)
+#+end_example
+
+
+#+begin_example
+(kurecolor-hex-to-hsv "#347291")
+ ⇒ '(0.5556 0.6414 0.5686)
+(kurecolor-hex-to-hsv "#729134")
+ ⇒ '(0.2222 0.6414 0.5686)
+(kurecolor-hex-to-hsv "#913472")
+ ⇒ '(0.8889 0.6414 0.5686)
+#+end_example
+
+
+#+begin_example
+(kurecolor-hsv-to-hex 0.556 0.65 0.5687)
+ ⇒ "#327191"
+(kurecolor-hsv-to-hex 1.0 0.7 1.0)
+ ⇒ "#FF4C4C"
+(kurecolor-hsv-to-hex 0.5 0.5 0.6)
+ ⇒ "#4C9999"
+#+end_example
+
+
+* lsp-origami
+
+#+begin_src emacs-lisp
+(use-package lsp-origami
+  :ensure t)
+
+(add-hook 'lsp-after-open-hook #'lsp-origami-try-enable)
+#+end_src
+
+#+RESULTS:
+| lsp-origami-try-enable | dap-ui--after-open | dap--after-open | doom-modeline-update-lsp |
+
+* lsp-tailwindcss
+https://github.com/merrickluo/lsp-tailwindcss
+#+begin_src emacs-lisp
+(use-package lsp-tailwindcss
+  :init
+  (setq lsp-tailwindcss-add-on-mode t))
+#+end_src
+
+#+RESULTS:
+: t

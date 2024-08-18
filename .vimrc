@@ -43,7 +43,7 @@ set smartindent
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
-set expandtab=4
+set expandtab
 " set textwidth=80
 " 80 char ruler
 " set colorcolumn=80
@@ -76,10 +76,17 @@ nnoremap <tab> :b#<cr>
 " fermer le buffer actuel. À confirmer en appuyant ENTRÉE
 nnoremap ç :bd
 
+"Enable and disable auto indent
+map <leader>a :setlocal autoindent<CR>
+map <leader>A :setlocal noautoindent<CR>
+
 " copy and paste
 " http://vim.wikia.com/wiki/Accessing_the_system_clipboard 
 set clipboard=unnamedplus
 
+set ignorecase
+set smartcase
+set linebreak
 " recursive search et tab-completion
 set path+=**
 " wildmenu
@@ -105,6 +112,7 @@ set showmatch " hightlight la  [{()}] ouvrante ou fermante
 set incsearch " recherche incrémentale
 set hlsearch " highlight la recherche
 
+set spelllang=fr_fr
 """ Folding
 set foldmethod=indent
 set foldenable " active le folding
@@ -151,3 +159,43 @@ endif
 
 """ Lilypond
 set runtimepath+=/usr/share/lilypond/2.18.2/vim/
+
+""" vim-lsp : python
+
+if executable('pylsp')
+    " pip install python-lsp-server
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'pylsp',
+        \ 'cmd': {server_info->['pylsp']},
+        \ 'allowlist': ['python'],
+        \ })
+endif
+
+function! s:on_lsp_buffer_enabled() abort
+    setlocal omnifunc=lsp#complete
+    setlocal signcolumn=yes
+    if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+    nmap <buffer> gd <plug>(lsp-definition)
+    nmap <buffer> gs <plug>(lsp-document-symbol-search)
+    nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
+    nmap <buffer> gr <plug>(lsp-references)
+    nmap <buffer> gi <plug>(lsp-implementation)
+    nmap <buffer> gt <plug>(lsp-type-definition)
+    nmap <buffer> <leader>rn <plug>(lsp-rename)
+    nmap <buffer> [g <plug>(lsp-previous-diagnostic)
+    nmap <buffer> ]g <plug>(lsp-next-diagnostic)
+    nmap <buffer> K <plug>(lsp-hover)
+    nnoremap <buffer> <expr><c-f> lsp#scroll(+4)
+    nnoremap <buffer> <expr><c-d> lsp#scroll(-4)
+
+    let g:lsp_format_sync_timeout = 1000
+    autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
+    
+    " refer to doc to add more commands
+endfunction
+
+augroup lsp_install
+    au!
+    " call s:on_lsp_buffer_enabled only for languages that has the server registered.
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
