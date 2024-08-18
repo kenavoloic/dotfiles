@@ -775,14 +775,14 @@ https://github.com/jwiegley/dot-emacs/blob/master/init.org
   :ensure t
   ;; Optional customizations
   :init
-  (global-corfu-mode)
-  (corfu-history-mode)
+  (global-corfu-mode 1)
+  (corfu-history-mode 1)
   (corfu-popupinfo-mode) ; Popup completion info
   :custom
   (corfu-cycle t)                 ; Allows cycling through candidates
   (corfu-auto t)                  ; Enable auto completion
-  (corfu-auto-prefix 2)           ; Minimum length of prefix for completion
-  (corfu-auto-delay 0)            ; No delay for completion
+  (corfu-auto-prefix 3)           ; Minimum length of prefix for completion
+  (corfu-auto-delay 0.1)            ; No delay for completion
   (corfu-popupinfo-delay '(0.5 . 0.2))  ; Automatically update info popup after that numver of seconds
   (corfu-preview-current 'insert) ; insert previewed candidate
   (corfu-preselect 'prompt)
