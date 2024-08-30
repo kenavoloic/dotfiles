@@ -13,7 +13,10 @@ Trigger garbage collection when I've been idle for five seconds and memory usage
     :ensure t
     :init
     (setq gcmh-idle-delay 5
-          gcmh-high-cons-threshold (* 16 1024 1024))
+          ;;gcmh-high-cons-threshold (* 16 1024 1024)
+	  gcmh-high-cons-threshold 16777216
+	  
+	  )
     :config
     (gcmh-mode))
 #+end_src
@@ -25,6 +28,7 @@ https://emacs-lsp.github.io/lsp-mode/page/performance/
 
 M-x lsp-doctor
 Check `read-process-output-max' default has been changed from 4k: OK
+
 #+begin_src emacs-lisp
 (setq read-process-output-max (* 4 1024 1024)) ;; 1mb
 
@@ -578,6 +582,15 @@ changement de fenêtre au moyen de SHIFT + flêche
 
 #+end_src
 
+https://raw.githubusercontent.com/bbatsov/emacs.d/master/init.el
+#+begin_src emacs-lisp
+(use-package elec-pair
+  :config
+  (electric-pair-mode +1))
+#+end_src
+
+#+RESULTS:
+
 * Programmation
 ** Surligne les nombres
 #+begin_src emacs-lisp
@@ -889,9 +902,7 @@ https://github.com/jwiegley/dot-emacs/blob/master/init.org
 	  org-tags-column 0 ; org column spacing for tags
 	  org-src-preserve-indentation t ; don't indent src block for export capital pour du pythonb
 	  org-src-fontify-natively t ; fontify
-	  )
-	;;:custom (initial-major-mode 'org-mode initial-scratch-message "#+TITLE: Scratch\n\n")
-	)
+	  ))
 #+end_src
 
 #+RESULTS:
@@ -933,7 +944,8 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 		  ("q" . "quote")
 		  ("v" . "verse")
 		  ("se" . "src emacs-lisp")
-		  ("st" . "src typescript")		  
+		  ("st" . "src typescript")
+		  ("sh" . "src sh")
 		  ("sp" . "src python :results output\n")
 		  ("sr" . "src R :results output\n")
 		  ("sj" . "src js :results output\n")
@@ -1031,8 +1043,10 @@ Ne pas oublier de M-x nerd-icons-install-fonts
     :init (doom-modeline-mode 1)
     :custom ((doom-modeline-height 15))
     :config (setq doom-modeline-buffer-file-name-style 'relative-from-project
+		  doom-modeline-enable-word-count nil
 		  doom-modeline-icon t
 		  doom-modeline-major-mode-icon t
+		  doom-modeline-major-mode-color-icon nil
 		  doom-modeline-buffer-state-icon t
 		  doom-modeline-major-mode-icon-color t))
 #+end_src
@@ -1289,9 +1303,9 @@ https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom(lsp-ui-doc-position 'bottom))
+;; (use-package lsp-ui
+;;   :hook (lsp-mode . lsp-ui-mode)
+;;   :custom(lsp-ui-doc-position 'bottom))
 
 #+end_src
 
@@ -1537,6 +1551,8 @@ https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config
 
 #+begin_src emacs-lisp
 (use-package lsp-mode
+  :ensure t
+  :defer t
   :init (setq lsp-keymap-prefix "C-c l"
 	      lsp-diagnostics-provider :flymake ;;:flycheck
 	      ;;lsp-modeline-code-actions-segments '(count icon name)
@@ -1544,6 +1560,10 @@ https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config
   :config (lsp-enable-which-key-integration t)
   :commands (lsp lsp-deferred))
 
+#+end_src
+
+#+begin_src emacs-lisp
+(setq warning-suppress-types '((lsp-mode)))
 #+end_src
 
 ;; https://github.com/emacs-lsp/dap-mode
@@ -1564,7 +1584,9 @@ https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config
 #+begin_src emacs-lisp
 (use-package lsp-ui
   :ensure t
-  :hook (lsp-mode . lsp-ui-mode)
+  :hook ((lsp-mode . lsp-ui-mode)
+	 ;;((tsx-ts-mode typescript-ts-mode js-ts-mode) . lsp-deferred)
+	 )
   :config
   (setq
    lsp-ui-doc-border (face-foreground 'default)
@@ -1579,6 +1601,7 @@ https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config
    lsp-ui-flycheck-enable t
    lsp-ui-flycheck-list-position 'right
    lsp-ui-flycheck-live-reporting t
+   lsp-enable-folding nil
    lsp-ui-imenu-enable nil
    lsp-ui-peek-enable t
    lsp-ui-peek-list-width 60
@@ -1648,7 +1671,9 @@ Ajout également de vimls/vils pour lsp
   :ensure t
   :config
   ;; (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-  (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2))))
+  ;;(add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
+  (add-hook 'js2-mode-hook 'lsp)
+  )
 #+end_src
 
 
@@ -1729,11 +1754,27 @@ https://github.com/emacsfodder/kurecolor
 
 * lsp-origami
 
+
+#+begin_src emacs-lisp
+(use-package origami
+  :config (global-origami-mode))
+#+end_src
+
+#+RESULTS:
+
 #+begin_src emacs-lisp
 (use-package lsp-origami
-  :ensure t)
+  :hook ((lsp-after-open . lsp-origami-mode)))
+#+end_src
 
-(add-hook 'lsp-after-open-hook #'lsp-origami-try-enable)
+#+RESULTS:
+| lsp-origami-mode | doom-modeline-update-lsp |
+
+#+begin_src emacs-lisp
+;; (use-package lsp-origami
+;;   :ensure t)
+
+;; (add-hook 'lsp-after-open-hook #'lsp-origami-try-enable)
 #+end_src
 
 #+RESULTS:
@@ -1749,3 +1790,85 @@ https://github.com/merrickluo/lsp-tailwindcss
 
 #+RESULTS:
 : t
+
+* avy projectile
+https://raw.githubusercontent.com/bbatsov/emacs.d/master/init.el
+#+begin_src emacs-lisp
+(use-package avy
+  :ensure t
+  :config (setq avy-background t))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package projectile
+  :ensure t
+  :config
+  (define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
+  (global-set-key (kbd "C-c p") 'projectile-command-map)
+  (projectile-mode +1))
+#+end_src
+
+* python
+#+begin_src emacs-lisp
+  (use-package python-mode
+    :ensure t
+    :hook (python-mode . lsp-deferred)
+    :custom
+    ;; NOTE: Set these if Python 3 is called "python3" on your system!
+    (python-shell-interpreter "python3")
+    (dap-python-executable "python3")
+    (dap-python-debugger 'debugpy)
+    :config
+    (require 'dap-python))
+#+end_src
+
+#+RESULTS:
+| lsp-deferred | doom-modeline-env-setup-python |
+
+#+begin_src emacs-lisp
+(use-package pyvenv
+  :ensure t
+  :config (pyvenv-mode t)
+  ;; Set correct Python interpreter
+  (setq pyvenv-post-activate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
+  (setq pyvenv-post-deactivate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter "python3")))))
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+  (setq org-babel-python-command "python3")
+  (setq org-babel-default-header-args:python
+		'((:results . "output")
+	  (:session . "none")
+	  (:shebang . "#!/usr/bin/env python3")
+	  (:flags  . "-i")))
+
+#+end_src
+
+#+RESULTS:
+: ((:results . output) (:session . none) (:shebang . #!/usr/bin/env python3) (:flags . -i))
+
+#+begin_src emacs-lisp
+  (setq python-shell-completion-native-enable nil)
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+;; active cet environnement virtuel par défaut
+(pyvenv-activate "~/envirs/env02/")
+#+end_src
+
+#+RESULTS:
+
+* typescript
+#+begin_src emacs-lisp
+(use-package typescript-mode
+  :ensure t
+  :mode "\\.ts\\'")
+#+end_src
