@@ -1430,9 +1430,6 @@ https://raw.githubusercontent.com/bbatsov/emacs.d/master/init.el
     (require 'dap-python))
 #+end_src
 
-#+RESULTS:
-| lsp-deferred | doom-modeline-env-setup-python |
-
 #+begin_src emacs-lisp
 (use-package pyvenv
   :ensure t
@@ -1458,9 +1455,6 @@ https://raw.githubusercontent.com/bbatsov/emacs.d/master/init.el
 
 #+end_src
 
-#+RESULTS:
-: ((:results . output) (:session . none) (:shebang . #!/usr/bin/env python3) (:flags . -i))
-
 #+begin_src emacs-lisp
   (setq python-shell-completion-native-enable nil)
 #+end_src
@@ -1471,8 +1465,6 @@ https://raw.githubusercontent.com/bbatsov/emacs.d/master/init.el
 ;; active cet environnement virtuel par défaut
 ;;(pyvenv-activate "~/envirs/env02/")
 #+end_src
-
-#+RESULTS:
 
 * typescript
 #+begin_src emacs-lisp
