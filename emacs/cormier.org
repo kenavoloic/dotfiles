@@ -1,0 +1,613 @@
+#+TITLE: Cormier
+#+AUTHOR: CCA
+#+STARTUP: content
+#+OPTIONS: toc:nil num:nil
+Création : <2024-10-30 mer.>
+
+* Use-package
+Existe désormais par défaut depuis emacs 29, donc require suffit.
+#+begin_src emacs-lisp
+(require 'use-package)
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+#+end_src
+
+https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
+#+begin_src emacs-lisp
+(setq use-package-always-defer t)
+#+end_src
+
+https://github.com/hrs/dotfiles/blob/main/emacs/.config/emacs/configuration.org
+#+begin_src emacs-lisp
+(use-package auto-compile
+  :ensure t
+  :config (auto-compile-on-load-mode))
+(setq load-prefer-newer t)
+#+end_src
+
+* Recharge configuration
+#+BEGIN_SRC emacs-lisp
+(defun rechargeConfiguration()
+(interactive)
+(load-file "~/.emacs.d/init.el"))
+#+END_SRC
+
+#+RESULTS:
+: rechargeConfiguration
+
+#+begin_src emacs-lisp
+(use-package restart-emacs
+  :ensure t)
+#+end_src
+
+
+* Interface
+** emacs
+#+begin_src emacs-lisp
+  (use-package emacs
+    :defer nil
+    :delight
+    (auto-fill-function " AF")
+    (visual-line-mode)
+    :config
+     (setq frame-title-format '("" (buffer-file-name "%f" (dired-directory dired-directory "%b")))
+	   inhibit-startup-screen t
+	   inhibit-splash-screen t
+	   scroll-bar-mode -1
+	   show-paren-mode 1
+	   show-paren-delay 0
+	   browse-url-browse-function 'browse-url-chromium
+	   tab-width 4
+	   transient-mark-mode t
+	   mouse-wheel-follow-mouse t
+	   scroll-step 1
+	   scroll-conservatively 101
+	   mouse-wheel-scroll-amount '(1)
+	   mouse-wheel-progressive-speed nil
+	   menu-bar-mode -1
+	   tool-bar-mode -1
+	   scroll-bar-mode -1
+	   use-short-answers t
+	   history-length 2000
+	   delete-by-moving-to-trash t)
+    )
+
+#+end_src
+
+#+RESULTS:
+: t
+
+https://raw.githubusercontent.com/bbatsov/emacs.d/master/init.el
+#+begin_src emacs-lisp
+(use-package elec-pair
+  :config
+  (electric-pair-mode +1))
+#+end_src
+
+** Misc
+#+begin_src emacs-lisp
+  ;; Disable startup message and UI elements
+  ;; (setq inhibit-startup-message t)
+  ;; (scroll-bar-mode -1)
+  ;; (tool-bar-mode -1)
+  ;; (menu-bar-mode -1)
+  ;; (tooltip-mode -1)
+  ;; (set-fringe-mode 10)
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Theme
+  ;; (use-package doom-themes
+  ;;   :config
+  ;;   (load-theme 'doom-one t))
+#+end_src
+
+** Theme
+#+begin_src emacs-lisp
+(use-package gruvbox-theme
+  :init (load-theme 'gruvbox-dark-medium t))
+#+end_src
+
+#+RESULTS:
+
+** windmove
+Changement de fenêtre au moyen de SHIFT + flêche
+#+begin_src emacs-lisp
+  (when (fboundp 'windmove-default-keybindings)
+    (windmove-default-keybindings))
+#+end_src
+** which-key  
+#+begin_src emacs-lisp
+(use-package which-key
+:config (which-key-mode))
+#+end_src
+** smart-shift
+https://github.com/hbin/smart-shift
+#+begin_src emacs-lisp
+(use-package smart-shift)
+#+end_src
+
+#+begin_src emacs-lisp
+;; binds C-C <arrows>
+(when (require 'smart-shift nil 'noerror)
+  (global-smart-shift-mode 1))
+#+end_src
+
+
+* Texte, typographie
+** Uppercase-region, lowercase-region
+https://github.com/pascalfleury/emacs-config/blob/master/emacs_setup.org
+#+begin_src emacs-lisp
+(put 'upcase-region 'disabled nil)  ;; C-x C-u
+(put 'downcase-region 'disabled nil)  ;; C-x C-l (lowercase L)
+
+;; C-x n <key>. Widen with C-x n w
+(put 'narrow-to-region 'disabled nil)  ; C-x n n
+(put 'narrow-to-defun  'disabled nil)
+(put 'narrow-to-page   'disabled nil)
+#+end_src
+
+** signes doubles
+  #+BEGIN_SRC emacs-lisp
+(defun cca-exclamation()
+  (interactive)
+  (save-excursion
+    (insert " !")))
+
+(defun cca-interrogation()
+  (interactive)
+  (save-excursion
+    (insert " ?")))
+
+(defun cca-deuxpoints()
+  (interactive)
+  (save-excursion
+    (insert " :")))
+
+(defun cca-pointvirgule()
+  (interactive)
+  (save-excursion
+    (insert " ;")))
+
+
+  #+END_SRC
+
+  #+RESULTS:
+  : cca-pointvirgule
+
+** espaces
+    #+BEGIN_SRC emacs-lisp
+;;; insert-char remplace ucs-insert depuis emacs 24
+    (defun cca-insecable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#xa0))
+
+    (defun cca-fine-secable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2009))
+
+    (defun cca-fine-insecable()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x202f))
+
+
+    (defun cca-tiret-cadratin()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2014))
+
+    (defun cca-tiret-demi-cadratin()
+      (interactive)
+      (save-excursion)
+    (insert-char '#x2013))
+  #+END_SRC
+
+  #+RESULTS:
+  : cca-tiret-demi-cadratin
+
+** ligatures et autres
+    #+BEGIN_SRC emacs-lisp
+
+(defun cca-ae()
+  (interactive)
+  (save-excursion)
+  (insert-char '#x00e6))
+ 
+(defun cca-oe()
+  (interactive)
+  (save-excursion)
+  (insert-char '#x0153))
+
+(defun cca-left()
+  (interactive)
+  (save-excursion)
+(insert-char '#x201c))
+
+(defun cca-right()
+  (interactive)
+  (save-excursion)
+(insert-char '#x201d))
+
+(defun cca-left-single()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2018))
+
+(defun cca-right-single()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2019))
+
+(defun cca-ampersand()
+  (interactive)
+  (save-excursion)
+(insert-char '#x026))
+
+(defun cca-apostrophe()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2019))
+
+(defun cca-suspension()
+  (interactive)
+  (save-excursion)
+(insert-char '#x2026))
+
+  #+END_SRC
+
+  #+RESULTS:
+  : cca-suspension
+
+** Recherche orthographique
+https://irfu.cea.fr/Pisp/vianney.lebouteiller/emacs.html
+#+begin_src emacs-lisp
+;;; https://irfu.cea.fr/Pisp/vianney.lebouteiller/emacs.html
+  (defun recherche-mot-dico()
+    "Recherche le mot sous le curseur dans cnrtl.fr "
+    (interactive)
+    (let (word)
+      (setq word
+	    (if (use-region-p)
+		(buffer-substring-no-properties (region-beginning) (region-end))
+	      (current-word)))
+      (setq word (replace-regexp-in-string " " "_" word))
+      (browse-url (concat "http://www.cnrtl.fr/definition/" word))
+  ))
+#+end_src
+
+#+RESULTS:
+: recherche-mot-dico
+
+* Spécifiques Windows
+Configure essential settings for Emacs on Windows 11.
+
+#+begin_src emacs-lisp
+
+;; Set default font
+(set-face-attribute 'default nil :font "Consolas" :height 120)
+
+;; Use UTF-8 encoding
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
+;; Windows specific settings
+(when (eq system-type 'windows-nt)
+  (setq default-directory "~/")
+  (setq command-line-default-directory "~/"))
+#+end_src
+
+#+begin_src emacs-lisp
+;; Open Windows explorer in current directory
+(defun open-explorer ()
+  "Open Windows Explorer in the current directory."
+  (interactive)
+  (shell-command "explorer ."))
+#+end_src
+
+* Dired
+
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil ; parce qu'il est désormais installé par défaut donc pas besoin de le télécharger
+    :diminish dired-omit-mode
+    :hook (dired-mode . dired-hide-details-mode) ;; par défaut masque les fichiers cachés
+    :custom
+    (dired-listing-switches "-agho --group-directories-first")
+    (dired-dwim-target t)
+  )
+
+#+end_src
+
+* Vertico, savehist, marginalia, orderless
+
+#+begin_src emacs-lisp
+(use-package vertico
+  :init (vertico-mode)
+  (setq vertico-count 10
+	vertico-resize t
+	vertico-cycle t))
+  
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package savehist
+  :init
+  (savehist-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package marginalia
+  :after vertico
+  :ensure t
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+  :init
+  (marginalia-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless) ;;'(orderless basic)
+	completion-category-defaults nil
+	completion-category-overrides 
+	'((file (styles partial-completion)))))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package nerd-icons-completion
+  ;;;:when (icons-displayable-p)
+  :hook (vertico-mode . nerd-icons-completion-mode))
+#+end_src
+
+* Programmation
+** Surligne les nombres
+#+begin_src emacs-lisp
+  (use-package highlight-numbers)
+  (add-hook 'prog-mode-hook 'highlight-numbers-mode)
+#+end_src
+
+#+RESULTS:
+| highlight-numbers-mode |
+
+** Outils (in/dé)crémente sous le curseur
+#+begin_src emacs-lisp
+  (defun incremente(&optional arg)
+    "Incrémenter le nombre sous le curseur"
+    (interactive "*p")
+    (let* ((bounds (bounds-of-thing-at-point 'word))
+	   (beg (car bounds))
+	   (end (cdr bounds))
+	   (num (string-to-number (buffer-substring beg end)))
+	   (incr (cond ((null arg) 1)
+		       ((listp arg) -1)
+		       (t arg)))
+	   (value (+ num incr)))
+      (delete-region beg end)
+      (insert (format "%d" value))))
+#+end_src
+
+#+RESULTS:
+: incremente
+
+#+begin_src emacs-lisp
+(defun plus()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point."))
+  (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
+(global-set-key (kbd "M-à") 'plus)
+#+end_src
+
+#+RESULTS:
+: plus
+
+#+begin_src emacs-lisp
+(defun moins()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point."))
+  (replace-match (number-to-string (1- (string-to-number (match-string 0))))))
+(global-set-key (kbd "M-é") 'moins)
+#+end_src
+
+#+RESULTS:
+: moins
+
+** Rainbow-delimiters
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+  :hook ((emacs-lisp-mode lisp-mode racket-mode) . rainbow-delimiters-mode))
+#+end_src
+#+begin_src emacs-lisp
+  ;; (use-package rainbow-delimiters
+  ;;   :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+** rainbow
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+  :init
+  (rainbow-mode))
+#+end_src
+** yasnippet
+#+begin_src emacs-lisp
+  (use-package yasnippet)
+#+end_src
+* Highlight line
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Cursor-Display.html#index-highlight-current-line
+#+begin_src emacs-lisp
+  (global-hl-line-mode)
+#+end_src
+* Open street map viewer
+
+;;; OSM CONFIGURATION
+;;; --------------------------------------
+;;;
+;;; https://elpa.gnu.org/packages/osm.html#org666a5ba
+#+begin_src emacs-lisp
+(use-package osm
+  :bind (("C-c o h" . osm-home)
+	 ("C-c o s" . osm-search)
+	 ("C-c o v" . osm-server)
+	 ("C-c o t" . osm-goto)
+	 ("C-c o x" . osm-gpx-show)
+	 ("C-c o j" . osm-bookmark-jump))
+  :init
+  :custom
+  (osm-server 'default)
+  (osm-home '(53.356116 -1.463397 15))
+  )
+#+end_src
+* Org mode en lieu et place de =scratch=
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (setq-default initial-major-mode 'org-mode
+			initial-scratch-message "#+TITLE: Cormier\n\n")
+#+end_src
+* org
+
+#+begin_src emacs-lisp
+  (use-package org
+	:ensure nil ; parce qu'il est désormais installé par défaut donc pas besoin de le télécharger
+	:config
+	(setq org-startup-indented t
+	  org-ellipsis " ↲"
+	  org-hide-emphasis-markers t
+	  org-startup-with-inline-images t
+	  org-image-actual-width '(450)
+	  org-hide-block-startup nil
+	  org-catch-invisible-edits 'error
+	  org-cycle-separator-lines 0
+	  org-startup-with-latex-preview nil
+	  org-export-with-smart-quotes t ; transforme ' en ’ au moment de l'export
+	  org-confirm-babel-evaluate nil
+	  org-tags-column 0 ; org column spacing for tags
+	  org-src-preserve-indentation t ; don't indent src block for export capital pour du pythonb
+	  org-src-fontify-natively t ; fontify
+	  ))
+#+end_src
+
+https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
+#+begin_src emacs-lisp
+  (use-package org-appear
+    :hook (org-mode . org-appear-mode))
+#+end_src
+
+** Visual-line mode
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook (lambda () (visual-line-mode 1)))
+
+#+end_src
+
+** Superstar
+#+begin_src emacs-lisp
+(use-package org-superstar
+:defer t
+:hook (org-mode . org-superstar-mode))
+#+end_src
+
+** Superstar
+#+begin_src emacs-lisp
+(use-package org-superstar
+:defer t
+:hook (org-mode . org-superstar-mode))
+#+end_src
+
+** ob-restclient
+#+begin_src emacs-lisp
+(use-package ob-restclient
+  :after org)
+#+end_src
+
+* org-tempo
+#+begin_src emacs-lisp
+(use-package org-tempo
+  :demand t
+  :ensure nil
+  :config (setq org-structure-template-alist
+		'(("el" . "src emacs-lisp")
+		  ("e" . "example")
+		  ("q" . "quote")
+		  ("v" . "verse")
+		  ("se" . "src emacs-lisp")
+		  ;;("st" . "src typescript")
+		  ;;("sh" . "src sh")
+		  ("sp" . "src python :results output\n")
+		  ("sr" . "src R :results output\n")
+		  ("sj" . "src js :results output\n")
+		  ("ja"  . "src java\n")
+		  ("sq" . "src sql\n"))))
+#+end_src
+
+* org-babel
+#+begin_src emacs-lisp
+(org-babel-do-load-languages 'org-babel-load-languages
+                             '(
+			       (C . t)
+                               (R . t)
+                               (awk . t)
+                               (clojure    . t)
+                               (dot . t)
+			       (emacs-lisp . t)
+			       (gnuplot . t)
+                               (haskell   . t)
+                               (java  . t)
+                               (js     . t)
+                               (latex . t)
+                               (lisp   . t)
+                               (perl . t)
+                               ;;(php . t)
+                               (plantuml . t)
+                               (python . t)
+                               (restclient . t)
+                               (ruby . t)
+			       (sass . t)
+                               (scheme . t)
+                               (sql    . t)
+			       (typescript . t)
+                               ;;(csharp . t)
+                               ;;(ein    . t)
+                               ;;(jupyter . t)
+                               ;;(scala . t)
+                               ))
+(setq org-confirm-babel-evaluate nil)
+;; https://sachachua.com/dotemacs => Diagrams and graphics
+(add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+#+end_src
+
+* modeline : diminish, moody, minions
+
+Ne pas oublier de M-x nerd-icons-install-fonts
+#+begin_src emacs-lisp
+  (use-package all-the-icons)
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1)
+    :custom ((doom-modeline-height 15))
+    :config (setq doom-modeline-buffer-file-name-style 'relative-from-project
+		  doom-modeline-enable-word-count nil
+		  doom-modeline-icon t
+		  doom-modeline-major-mode-icon t
+		  doom-modeline-major-mode-color-icon nil
+		  doom-modeline-buffer-state-icon t
+		  doom-modeline-major-mode-icon-color t))
+#+end_src
+
+* plantuml
+#+begin_src emacs-lisp
+(setq org-plantuml-exec-mode 'plantuml)
+;;(setq org-plantuml-executable-path "~/.config/plantuml.jar")
+(setq org-plantuml-jar-path (expand-file-name "~/Downloads/plantuml.jar"))
+
+#+end_src

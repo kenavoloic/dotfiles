@@ -950,6 +950,7 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 		  ("sr" . "src R :results output\n")
 		  ("sj" . "src js :results output\n")
 		  ("ja"  . "src java\n")
+		  ("sqn"  . "src sql :results output :eval no\n")
 		  ("sq" . "src sql\n"))))
 #+end_src
 
