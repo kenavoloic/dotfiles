@@ -950,6 +950,7 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 		  ("sr" . "src R :results output\n")
 		  ("sj" . "src js :results output\n")
 		  ("ja"  . "src java\n")
+		  ("sc"  . "src C :exports results :tangle sources/")
 		  ("sqn"  . "src sql :results output :eval no\n")
 		  ("sq" . "src sql\n"))))
 #+end_src
@@ -1877,3 +1878,76 @@ https://raw.githubusercontent.com/bbatsov/emacs.d/master/init.el
   :ensure t
   :mode "\\.ts\\'")
 #+end_src
+
+* c
+#+begin_src emacs-lisp
+  ;; Enable C mode for .c and .h files
+  (add-to-list 'auto-mode-alist '("\\.c\\'" . c-mode))
+  (add-to-list 'auto-mode-alist '("\\.h\\'" . c-mode))
+  ;; Set up indentation and style
+  (setq c-default-style "linux"
+        c-basic-offset 4)
+
+#+end_src
+
+#+RESULTS:
+: 4
+
+#+begin_src emacs-lisp
+  ;; Enable lsp-mode for language server support
+  ;;(require 'lsp-mode)
+  (add-hook 'c-mode-hook #'lsp)
+
+#+end_src
+
+#+RESULTS:
+| lsp | macrostep-c-mode-hook |
+
+#+begin_src emacs-lisp
+  ;; Configure lsp-mode for C
+  (setq lsp-clients-clangd-args '("-std=c11"
+                                 "--background-index"
+                                 "--suggest-missing-includes"
+                                 "--compile-commands-dir=build"))
+
+#+end_src
+
+#+RESULTS:
+| -std=c11 | --background-index | --suggest-missing-includes | --compile-commands-dir=build |
+
+#+begin_src emacs-lisp
+  (add-hook 'c-mode-hook #'company-mode)
+#+end_src
+
+#+RESULTS:
+| company-mode | lsp | macrostep-c-mode-hook |
+
+#+begin_src emacs-lisp
+(use-package clang-format)
+;  (require 'clang-format)
+  (add-hook 'c-mode-hook #'clang-format-bindings)
+
+#+end_src
+
+#+RESULTS:
+| clang-format-bindings | company-mode | lsp | macrostep-c-mode-hook |
+
+#+begin_src emacs-lisp
+  ;; Integrate with compile and recompile commands
+  (global-set-key (kbd "C-c c") 'compile)
+  (global-set-key (kbd "C-c r") 'recompile)
+
+#+end_src
+
+#+RESULTS:
+: recompile
+
+#+begin_src emacs-lisp
+  ;; Enable gdb integration
+  (require 'gdb-mi)
+  (setq gdb-many-windows t)
+
+#+end_src
+
+#+RESULTS:
+: t
