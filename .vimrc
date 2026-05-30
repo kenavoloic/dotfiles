@@ -74,7 +74,7 @@ nnoremap à :bn<cr>
 " aller au dernier buffer
 nnoremap <tab> :b#<cr>
 " fermer le buffer actuel. À confirmer en appuyant ENTRÉE
-nnoremap ç :bd
+nnoremap ç :bd<cr>
 
 "Enable and disable auto indent
 map <leader>a :setlocal autoindent<CR>
@@ -125,8 +125,8 @@ let g:netrw_banner=0 " supprime le bandeau initial
 let g:netrw_browse_split=4 "open in the prior window
 let g:netrw_altv=0 " open splits to the right
 let g:netrw_liststyle=3 " tree view
-let g:netrw_list_hide=netrw_gitignore#Hide()
-let g:netrw_list_hide.='\(^\|\s\s\)\zs.*\.\~$' " cacher les fichiers de type *.*~ 
+"let g:netrw_list_hide=netrw_gitignore#Hide()
+"let g:netrw_list_hide.='\(^\|\s\s\)\zs.*\.\~$' " cacher les fichiers de type *.*~ 
 
 """Airline  
 let g:airline_theme='badwolf'
@@ -147,7 +147,7 @@ let g:airline#extensions#tabline#formatter='unique_tail'
 let g:airline_left_alt_sep = ''
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
-let g:airline_righ_alt_sep = ''
+let g:airline_right_alt_sep = ''
 
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
@@ -198,4 +198,10 @@ augroup lsp_install
     au!
     " call s:on_lsp_buffer_enabled only for languages that has the server registered.
     autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+
+" Alternative : désactiver spécifiquement pour Python
+augroup python_lsp_disable
+    autocmd!
+    autocmd FileType python let b:lsp_diagnostics_enabled = 0
 augroup END

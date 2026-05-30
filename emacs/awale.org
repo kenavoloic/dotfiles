@@ -706,6 +706,9 @@ https://github.com/jwiegley/dot-emacs/blob/master/init.org
 
 #+end_src
 
+#+RESULTS:
+: /usr/share/plantuml/plantuml.jar
+
 * xclip
 #+begin_src emacs-lisp
 (use-package xclip)
@@ -852,11 +855,53 @@ https://github.com/jwiegley/dot-emacs/blob/master/init.org
 #+end_src
 * Flycheck
 #+begin_src emacs-lisp
-  (use-package flycheck
-  :init
-  (global-flycheck-mode t))
+  ;; (use-package flycheck
+  ;; :init
+  ;; (global-flycheck-mode t))
 
-  (use-package elisp-lint)
+  ;; (use-package elisp-lint)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package elisp-lint)
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+(use-package flycheck
+  :init
+  (global-flycheck-mode t)
+  :config
+  ;; Utilise executable-find (compatible Emacs 28 et +)
+  (setq flycheck-executable-find
+        (lambda (cmd)
+          (or (executable-find cmd)
+              (let ((uv-env (or (getenv "VIRTUAL_ENV") (getenv "UV_ENV"))))
+                (when uv-env
+                  (let ((ruff-path (expand-file-name (concat uv-env "/bin/" cmd))))
+                    (if (file-exists-p ruff-path) ruff-path nil)))))))
+  ;; Force le format de sortie valide pour Ruff
+  (setq flycheck-ruff-args '("--output-format=text")))
+#+end_src
+
+
+#+begin_src emacs-lisp
+;; (use-package flycheck
+;;   :init
+;;   (global-flycheck-mode t)
+;;   :config
+;;   ;; Force Flycheck à utiliser le Ruff de l'environnement uv
+;;   (setq flycheck-executable-find
+;;         (lambda (cmd)
+;;           (or (locate-file-in-path cmd)
+;;               (let ((uv-env (or (getenv "VIRTUAL_ENV") (getenv "UV_ENV"))))
+;;                 (when uv-env
+;;                   (expand-file-name (concat uv-env "/bin/" cmd)))))))
+;;   ;; Corriger le format de sortie invalide
+;;   (setq flycheck-ruff-args '("--output-format=text")))
+
+
 #+end_src
 
 * Flymake
@@ -950,8 +995,12 @@ https://github.com/pprevos/emacs-config/blob/main/emacs-configuration.org
 		  ("sr" . "src R :results output\n")
 		  ("sj" . "src js :results output\n")
 		  ("ja"  . "src java\n")
-		  ("sc"  . "src C :exports results :tangle sources/")
-		  ("sqn"  . "src sql :results output :eval no\n")
+		  ("sc"  . "src C")
+		  ("sl"  . "src lilypond :file xxx.pdf")
+		  ("sc2"  . "src C :exports results :tangle sources/\n")
+		  ("snq"  . "src sql :eval no\n")
+		  ("su"  . "src plantuml :file images/image.png\n")
+		  ("sx" . "src xml\n")
 		  ("sq" . "src sql\n"))))
 #+end_src
 
@@ -1159,6 +1208,27 @@ Allow exporting presentations to beamer.
 #+RESULTS:
 : t
 
+
+* org-special-block-extras
+https://alhassy.com/emacs.d/index.html
+
+#+begin_src emacs-lisp
+;; (defun org-special-block-extras-short-names ())
+#+end_src
+
+#+RESULTS:
+: org-special-block-extras-short-names
+
+#+begin_src emacs-lisp
+;; (use-package org-special-block-extras
+;;   :hook (org-mode . org-special-block-extras-mode)
+;;   :config
+;;     ;; Use short names like ‘defblock’ instead of the fully qualified name
+;;      ;; ‘org-special-block-extras--defblock’
+;;   (org-special-block-extras-short-names))
+#+end_src
+
+#+RESULTS:
 
 * eslint
 https://emacs-lsp.github.io/lsp-mode/tutorials/reactjs-tutorial/#linting
@@ -1556,16 +1626,53 @@ https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config
 * lsp5
 
 #+begin_src emacs-lisp
+;; (use-package lsp-mode
+;;   :ensure t
+;;   :defer t
+;;   :init (setq lsp-keymap-prefix "C-c l"
+;; 	      lsp-diagnostics-provider :flymake ;;:flycheck
+;; 	      ;;lsp-modeline-code-actions-segments '(count icon name)
+;; 	      )
+;;   :config (lsp-enable-which-key-integration t)
+;;   :commands (lsp lsp-deferred))
+
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package lsp-mode
   :ensure t
   :defer t
   :init (setq lsp-keymap-prefix "C-c l"
-	      lsp-diagnostics-provider :flymake ;;:flycheck
-	      ;;lsp-modeline-code-actions-segments '(count icon name)
-	      )
-  :config (lsp-enable-which-key-integration t)
+              lsp-diagnostics-provider :flymake) ; ou :flycheck
+  :config
+  (lsp-enable-which-key-integration t)
+  ;; Utilise executable-find pour trouver ruff-lsp
+  (setq lsp-ruff-executable
+        (lambda ()
+          (or (executable-find "ruff-lsp")
+              (let ((uv-env (or (getenv "VIRTUAL_ENV") (getenv "UV_ENV"))))
+                (when uv-env
+                  (let ((ruff-lsp-path (expand-file-name (concat uv-env "/bin/ruff-lsp"))))
+                    (if (file-exists-p ruff-lsp-path) ruff-lsp-path nil)))))))
   :commands (lsp lsp-deferred))
+#+end_src
 
+#+begin_src emacs-lisp
+;; (use-package lsp-mode
+;;   :ensure t
+;;   :defer t
+;;   :init (setq lsp-keymap-prefix "C-c l"
+;;               lsp-diagnostics-provider :flymake) ; ou :flycheck si tu préfères
+;;   :config
+;;   (lsp-enable-which-key-integration t)
+;;   ;; Pointer vers le Ruff de l'environnement uv
+;;   (setq lsp-ruff-executable
+;;         (lambda ()
+;;           (or (locate-file-in-path "ruff")
+;;               (let ((uv-env (or (getenv "VIRTUAL_ENV") (getenv "UV_ENV"))))
+;;                 (when uv-env
+;;                   (expand-file-name (concat uv-env "/bin/ruff")))))))
+;;   :commands (lsp lsp-deferred))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1832,16 +1939,16 @@ https://raw.githubusercontent.com/bbatsov/emacs.d/master/init.el
 | lsp-deferred | doom-modeline-env-setup-python |
 
 #+begin_src emacs-lisp
-(use-package pyvenv
-  :ensure t
-  :config (pyvenv-mode t)
-  ;; Set correct Python interpreter
-  (setq pyvenv-post-activate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
-  (setq pyvenv-post-deactivate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter "python3")))))
+;; (use-package pyvenv
+;;   :ensure t
+;;   :config (pyvenv-mode t)
+;;   ;; Set correct Python interpreter
+;;   (setq pyvenv-post-activate-hooks
+;;         (list (lambda ()
+;;                 (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
+;;   (setq pyvenv-post-deactivate-hooks
+;;         (list (lambda ()
+;;                 (setq python-shell-interpreter "python3")))))
 #+end_src
 
 #+RESULTS:
@@ -1867,7 +1974,9 @@ https://raw.githubusercontent.com/bbatsov/emacs.d/master/init.el
 
 #+begin_src emacs-lisp
 ;; active cet environnement virtuel par défaut
-(pyvenv-activate "~/envirs/env02/")
+;;(pyvenv-activate "~/envirs/env02/")
+;; désactive depuis le passage à uv
+;; 29.04.2026
 #+end_src
 
 #+RESULTS:
@@ -1951,3 +2060,64 @@ https://raw.githubusercontent.com/bbatsov/emacs.d/master/init.el
 
 #+RESULTS:
 : t
+
+* tex config
+#+begin_src emacs-lisp
+(use-package auctex
+  :custom
+  (TeX-parse-self t)
+
+  :config
+  (TeX-global-PDF-mode 1)
+
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (LaTeX-math-mode)
+              (setq TeX-master t))))
+#+end_src
+
+#+RESULTS:
+
+* Docker
+#+begin_src emacs-lisp
+(use-package docker
+  :ensure t
+  :bind ("C-c d" . docker))
+#+end_src
+
+#+RESULTS:
+: docker
+
+* noxml-fold
+https://github.com/paddymcall/noXML-fold/tree/master
+#+begin_src emacs-lisp
+(add-hook 'nxml-mode-hook (lambda () (require 'noxml-fold)))
+#+end_src
+
+#+RESULTS:
+| #[nil ((require 'noxml-fold)) nil] |
+
+* pipenv
+https://github.com/pwalsh/pipenv.el
+#+begin_src emacs-lisp
+(use-package pipenv
+  :hook (python-mode . pipenv-mode))
+#+end_src
+
+#+RESULTS:
+| pipenv-mode | lsp-deferred | doom-modeline-env-setup-python |
+
+* claude.code
+#+begin_src emacs-lisp
+  (require 'claude-code)
+  (global-set-key (kbd "C-c a") 'claude-code-transient)
+#+end_src
+
+* uv-mode
+#+begin_src emacs-lisp
+(use-package uv-mode
+  :hook (python-mode . uv-mode-auto-activate-hook))
+#+end_src
+
+#+RESULTS:
+| uv-mode-auto-activate-hook | pipenv-mode | lsp-deferred | doom-modeline-env-setup-python |
